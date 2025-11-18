@@ -42,7 +42,7 @@ cd cardiovascular-monitor
 3. **Create virtual environment**
 \`\`\`bash
 python -m venv venv
-source venv/bin/activate # On Windows: venv\Scripts\activate
+**Mac/Linux:** source venv/bin/activate **Windows**: venv\Scripts\activate
 \`\`\`
 
 4. **Install dependencies**
