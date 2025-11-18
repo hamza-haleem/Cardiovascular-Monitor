@@ -285,6 +285,15 @@ if page == "📋 Diagnostic Report":
         st.markdown("""
         <style>
         div.stButton > button {
+            display: inline-block;
+            font-size: 20px;
+            padding: 15px 40px;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            text-align: center;
             width: 100%;
         }
         </style>
@@ -621,6 +630,7 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
 
 
 
