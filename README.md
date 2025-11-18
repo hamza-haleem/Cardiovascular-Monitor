@@ -35,26 +35,27 @@ A professional clinical decision support application for heart disease risk asse
 
 1. **Clone the repository**
 \`\`\`bash
-git clone https://github.com/hamza-haleem/Cardiovascular-Monitor
+git clone https://github.com/hamza-haleem/cardiovascular-monitor.git
+cd cardiovascular-monitor
 \`\`\`
 
-2. **Create virtual environment**
+3. **Create virtual environment**
 \`\`\`bash
 python -m venv venv
 source venv/bin/activate # On Windows: venv\Scripts\activate
 \`\`\`
 
-3. **Install dependencies**
+4. **Install dependencies**
 \`\`\`bash
 pip install -r requirements.txt 
 \`\`\` [Dependencies](requirements.txt)
 
-4. **Run the app**
+5. **Run the app**
 \`\`\`bash
 streamlit run cardiovascular_monitor.py 
 \`\`\` [APP](cardiovascular_monitor.py)
 
-5. **Open in browser**
+6. **Open in browser**
 \`\`\`
 http://localhost:8501
 \`\`\`
