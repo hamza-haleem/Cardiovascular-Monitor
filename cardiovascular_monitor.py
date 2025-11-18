@@ -298,9 +298,8 @@ if page == "📋 Diagnostic Report":
                 width: 100%;
             }
             </style>
-            <button class="big-button">Perform Assessment</button>
-            """, unsafe_allow_html=True
-        )
+            """, unsafe_allow_html=True)
+            do_predict = st.button("Perform Assessment")
 
     with col_upload:
         uploaded_file = st.file_uploader("Upload CSV for batch predictions", type=["csv"])
@@ -630,6 +629,7 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
 
 
 
