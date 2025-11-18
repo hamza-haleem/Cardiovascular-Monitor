@@ -162,7 +162,6 @@ The application compares 6 machine learning models:
 
 ## 🛠️ Dependencies
 
-\`\`\`
 - **streamlit**
 - **pandas**
 - **numpy**
@@ -171,7 +170,6 @@ The application compares 6 machine learning models:
 - **xgboost**
 - **plotly**
 - **matplotlib**
-\`\`\`
 
 ## 📝 Input Validation
 
