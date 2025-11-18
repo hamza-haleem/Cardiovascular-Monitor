@@ -276,11 +276,16 @@ if page == "📋 Diagnostic Report":
             st.warning(f"⚠️ {warning}")
 
 
-    st.markdown("---")
-    col_predict, col_upload = st.columns([2,1])
+    st.markdown("""
+    <style>
+    div.stButton > button {
+        width: 50%;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
-    with col_predict:
-        do_predict = st.button("Perform Assessment")
+    do_predict = st.button("Perform Assessment")
+
 
     with col_upload:
         uploaded_file = st.file_uploader("Upload CSV for batch predictions", type=["csv"])
@@ -610,5 +615,6 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
 
 
