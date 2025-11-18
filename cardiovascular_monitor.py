@@ -284,16 +284,7 @@ if page == "📋 Diagnostic Report":
         # Use markdown + HTML to make a bigger button
         st.markdown("""
         <style>
-        .big-button {
-            display: inline-block;
-            font-size: 20px;
-            padding: 15px 40px;
-            background-color: #4CAF50;
-            color: white;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            text-align: center;
+        div.stButton > button {
             width: 100%;
         }
         </style>
@@ -630,6 +621,7 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
 
 
 
