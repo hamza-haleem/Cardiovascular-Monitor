@@ -280,7 +280,7 @@ if page == "📋 Diagnostic Report":
     col_predict, col_upload = st.columns([1,1])
 
     with col_predict:
-        do_predict = st.button("Perform Assessment", width='stretch')
+        do_predict = st.button("Perform Assessment")
 
     with col_upload:
         uploaded_file = st.file_uploader("Upload CSV for batch predictions", type=["csv"])
@@ -610,3 +610,4 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
