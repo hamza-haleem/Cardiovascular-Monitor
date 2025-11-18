@@ -46,7 +46,7 @@ source venv/bin/activate # On Windows: venv\Scripts\activate
 
 3. **Install dependencies**
 \`\`\`bash
-pip install -r requirements.txt [requirements](requirements.txt)
+pip install -r requirements.txt [Dependencies](requirements.txt)
 \`\`\`
 
 4. **Run the app**
@@ -70,15 +70,15 @@ https://cardiovascular-monitor.streamlit.app
 
 
 **cardiovascular-monitor**
-- ├── cardiovascular_monitor.py         # Main Streamlit application
-- ├── best_heart_model.pkl              # Trained XGBoost model
-- ├── preprocessor.pkl                  # Data preprocessor (StandardScaler)
-- ├── heart.csv                         # Training dataset
-- ├── model_performance.csv             # Model evaluation metrics
-- ├── train_models.py                   # Model training script
-- ├── requirements.txt                  # Python dependencies
-- └── README.md                         # This file
-\`\`\`
+- *cardiovascular_monitor.py*         - Main Streamlit application
+- *best_heart_model.pkl*              - Trained XGBoost model
+- *preprocessor.pkl*                  - Data preprocessor (StandardScaler)
+- *heart.csv*                         - Training dataset
+- *model_performance.csv*             - Model evaluation metrics
+- *train_models.py*                   - Model training script
+- *requirements.txt*                  - Python dependencies
+- *README.md*                         - This file
+  
 
 ## 💻 Usage Guide
 
