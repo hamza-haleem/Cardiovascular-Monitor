@@ -277,7 +277,7 @@ if page == "📋 Diagnostic Report":
 
 
     st.markdown("---")
-    col_predict, col_upload = st.columns([1,1])
+    col_predict, col_upload = st.columns([2,1])
 
     with col_predict:
         do_predict = st.button("Perform Assessment")
@@ -610,4 +610,5 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
 
