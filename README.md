@@ -27,8 +27,7 @@ A professional clinical decision support application for heart disease risk asse
 - Age, Sex, Chest Pain Type, Resting Blood Pressure
 - Cholesterol, Fasting Blood Sugar
 - Resting Electrocardiographic Results, Maximum Heart Rate
-- Exercise Induced Angina, Oldpeak
-- ST Slope
+- Exercise Induced Angina, Oldpeak, ST Slope
 
 ## 🚀 Quick Start
 
