@@ -286,7 +286,7 @@ if page == "📋 Diagnostic Report":
         <style>
         div.stButton > button {
             display: inline-block;
-            font-size: 20px;
+            font-size: 50px;
             padding: 15px 40px;
             background-color: #4CAF50;
             color: white;
@@ -630,6 +630,7 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
 
 
 
