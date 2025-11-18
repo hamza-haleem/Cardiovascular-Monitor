@@ -129,7 +129,7 @@ https://cardiovascular-monitor.streamlit.app
 To retrain the model with new data:
 
 \`\`\`bash
-python train_models.py
+python train_models.py [Training Script](train_models.py)
 \`\`\`
 
 This will:
@@ -162,14 +162,14 @@ The application compares 6 machine learning models:
 ## 🛠️ Dependencies
 
 \`\`\`
-streamlit
-pandas
-numpy
-joblib
-scikit-learn
-xgboost
-plotly
-matplotlib
+- **streamlit**
+- **pandas**
+- **numpy**
+- **joblib**
+- **scikit-learn**
+- **xgboost**
+- **plotly**
+- **matplotlib**
 \`\`\`
 
 ## 📝 Input Validation
