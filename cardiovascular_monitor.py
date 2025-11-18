@@ -277,12 +277,30 @@ if page == "📋 Diagnostic Report":
 
 
     st.markdown("---") 
-      col_predict, col_upload = st.columns([1,1])
+    # Create two columns
+    col_predict, col_upload = st.columns([1, 1])
 
     with col_predict:
-        col = st.container()
-        do_predict = st.button("Perform Assessment")
-
+        # Use markdown + HTML to make a bigger button
+        st.markdown(
+            """
+            <style>
+            .big-button {
+                display: inline-block;
+                font-size: 20px;
+                padding: 15px 40px;
+                background-color: #4CAF50;
+                color: white;
+                border-radius: 8px;
+                border: none;
+                cursor: pointer;
+                text-align: center;
+                width: 100%;
+            }
+            </style>
+            <button class="big-button">Perform Assessment</button>
+            """, unsafe_allow_html=True
+        )
 
     with col_upload:
         uploaded_file = st.file_uploader("Upload CSV for batch predictions", type=["csv"])
@@ -612,6 +630,7 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
 
 
 
