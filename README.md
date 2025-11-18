@@ -51,7 +51,7 @@ pip install -r requirements.txt [requirements](requirements.txt)
 
 4. **Run the app**
 \`\`\`bash
-- streamlit run cardiovascular_monitor.py [APP](cardiovascular_monitor.py)
+streamlit run cardiovascular_monitor.py [APP](cardiovascular_monitor.py)
 \`\`\`
 
 5. **Open in browser**
@@ -68,8 +68,8 @@ https://cardiovascular-monitor.streamlit.app
 
 ## 📋 Files in This Repository
 
-\`\`\`
-cardiovascular-monitor/
+
+**cardiovascular-monitor**
 - ├── cardiovascular_monitor.py         # Main Streamlit application
 - ├── best_heart_model.pkl              # Trained XGBoost model
 - ├── preprocessor.pkl                  # Data preprocessor (StandardScaler)
