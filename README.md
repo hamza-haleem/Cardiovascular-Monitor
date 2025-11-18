@@ -46,13 +46,13 @@ source venv/bin/activate # On Windows: venv\Scripts\activate
 
 3. **Install dependencies**
 \`\`\`bash
-pip install -r requirements.txt [Dependencies](requirements.txt)
-\`\`\`
+pip install -r requirements.txt 
+\`\`\` [Dependencies](requirements.txt)
 
 4. **Run the app**
 \`\`\`bash
-streamlit run cardiovascular_monitor.py [APP](cardiovascular_monitor.py)
-\`\`\`
+streamlit run cardiovascular_monitor.py 
+\`\`\` [APP](cardiovascular_monitor.py)
 
 5. **Open in browser**
 \`\`\`
@@ -129,8 +129,8 @@ https://cardiovascular-monitor.streamlit.app
 To retrain the model with new data:
 
 \`\`\`bash
-python train_models.py [Training Script](train_models.py)
-\`\`\`
+python train_models.py 
+\`\`\` [Training Script](train_models.py)
 
 This will:
 - Load and preprocess heart.csv
