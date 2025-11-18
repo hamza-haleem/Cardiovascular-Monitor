@@ -36,24 +36,23 @@ A professional clinical decision support application for heart disease risk asse
 
 1. **Clone the repository**
 \`\`\`bash
-git clone https://github.com/yourusername/cardiovascular-monitor.git
-cd cardiovascular-monitor
+git clone https://github.com/hamza-haleem/Cardiovascular-Monitor
 \`\`\`
 
 2. **Create virtual environment**
 \`\`\`bash
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source venv/bin/activate # On Windows: venv\Scripts\activate
 \`\`\`
 
 3. **Install dependencies**
 \`\`\`bash
-pip install -r requirements.txt
+pip install -r requirements.txt [requirements](requirements.txt)
 \`\`\`
 
 4. **Run the app**
 \`\`\`bash
-streamlit run cardiovascular_monitor.py
+- streamlit run cardiovascular_monitor.py [APP](cardiovascular_monitor.py)
 \`\`\`
 
 5. **Open in browser**
@@ -72,14 +71,14 @@ https://cardiovascular-monitor.streamlit.app
 
 \`\`\`
 cardiovascular-monitor/
-├── cardiovascular_monitor.py         # Main Streamlit application
-├── best_heart_model.pkl              # Trained XGBoost model
-├── preprocessor.pkl                  # Data preprocessor (StandardScaler)
-├── heart.csv                         # Training dataset
-├── model_performance.csv             # Model evaluation metrics
-├── train_models.py                   # Model training script
-├── requirements.txt                  # Python dependencies
-└── README.md                         # This file
+- ├── cardiovascular_monitor.py         # Main Streamlit application
+- ├── best_heart_model.pkl              # Trained XGBoost model
+- ├── preprocessor.pkl                  # Data preprocessor (StandardScaler)
+- ├── heart.csv                         # Training dataset
+- ├── model_performance.csv             # Model evaluation metrics
+- ├── train_models.py                   # Model training script
+- ├── requirements.txt                  # Python dependencies
+- └── README.md                         # This file
 \`\`\`
 
 ## 💻 Usage Guide
@@ -113,7 +112,7 @@ cardiovascular-monitor/
 1. Go to **"Prediction History"** tab
 2. Filter by:
    - Risk Category (Low/Medium/High)
-   - Probability Threshold
+   - Date Range
 3. View all previous predictions
 4. Download filtered results
 
@@ -195,17 +194,7 @@ Contributions are welcome! Please:
 
 For issues or questions:
 - Open an issue on GitHub
-- Contact: [hamza.gcuf.edu@gmail.com]
-
-## 📄 License
-
-This project is licensed under the MIT License - see LICENSE file for details.
-
-## 👨‍💻 Author
-**[Hamza Haleem]**
 - LinkedIn: [Hamza Haleem](https://www.linkedin.com/in/hamza-analyst)
-
-Created as a clinical decision support application for heart disease risk assessment.
 
 ---
 
