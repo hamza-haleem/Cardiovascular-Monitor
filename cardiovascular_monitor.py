@@ -276,15 +276,11 @@ if page == "📋 Diagnostic Report":
             st.warning(f"⚠️ {warning}")
 
 
-    st.markdown("""
-    <style>
-    div.stButton > button {
-        width: 50%;
-    }
-    </style>
-    """, unsafe_allow_html=True)
+    st.markdown("---") 
+      col_predict, col_upload = st.columns([1,1])
 
-    do_predict = st.button("Perform Assessment")
+    col = st.container() 
+        do_predict = st.button("Perform Assessment")
 
 
     with col_upload:
@@ -615,6 +611,7 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
 
 
 
