@@ -398,7 +398,7 @@ if page == "📋 Diagnostic Report":
                 "Max HR": "💓",
                 "Exercise Angina": "🏃",
                 "Oldpeak": "📈",
-                "ST Slope": "〽️"
+                "ST Slope": "〽️❤️"
             }
     
             summary_display = pd.DataFrame({
@@ -496,8 +496,8 @@ if page == "📋 Diagnostic Report":
                         ),
                     
                         legend=dict(
-                            font=dict(color='#000', size=11),
-                            bgcolor='rgba(255,255,255,0.7)'
+                            font=dict(color='black', size=12),
+                            bgcolor='rgba(255,255,255,0.5)'
                         ),
                     
                         hovermode='closest',
@@ -508,7 +508,7 @@ if page == "📋 Diagnostic Report":
                         hovertemplate='<b>%{x}</b><br>%{fullData.name}: %{y:.2f}<extra></extra>',
                         hoverlabel=dict(
                             font_color="black",
-                            bgcolor="white"
+                            bgcolor="black"
                         )
                     )
 
@@ -796,6 +796,7 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
 
 
 
