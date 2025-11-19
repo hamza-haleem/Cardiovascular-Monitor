@@ -159,7 +159,7 @@ def medical_suggestions(input_df):
         if items:
             final_suggestions.append(f"\n**{category}:**")
             for item in items:
-                final_suggestions.append(f"  -> {item}")
+                final_suggestions.append(f" {item}")
     
     if not final_suggestions:
         final_suggestions = ["No significant red flags detected. Maintain healthy lifestyle and routine check-ups."]
@@ -459,7 +459,7 @@ if page == "📋 Diagnostic Report":
                 st.markdown("### 📑 Clinical Recommendations")
                 with st.expander("View Clinical Recommendations & Risk Factors", expanded=False):
                     for s in suggestions:
-                        st.write("- " + s)
+                        st.write("-" + s)
     
                 # Comparison chart (Plotly)
                 if dataset is not None:
@@ -629,6 +629,7 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
 
 
 
