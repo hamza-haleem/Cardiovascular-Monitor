@@ -588,8 +588,8 @@ elif page == "📊 Data Insights":
 
         st.subheader("Feature Distributions")
         feature = st.selectbox("Choose feature to analyze", options=numeric_cols, index=0)
-        fig = px.histogram(dataset, x=feature, nbins=30, title=f"Distribution: {feature}", marginal="box")
-        fig.update_layout(
+        fig_dist = px.histogram(dataset, x=feature, nbins=30, title=f"Distribution: {feature}", marginal="box")
+        fig_dist.update_layout(
             font=dict(color='#000', size=11),
         
             title=dict(
@@ -615,12 +615,12 @@ elif page == "📊 Data Insights":
         
         
 
-        st.plotly_chart(fig, config={'responsive': True}, key="featuredis")
+        st.plotly_chart(fig_dist, config={'responsive': True}, key="featuredist")
 
         st.subheader("Correlation Heatmap")
         corr = dataset[numeric_cols].corr()
-        fig2 = px.imshow(corr, text_auto=True, title="Feature Correlations", color_continuous_scale="RdBu")
-        fig2.update_layout(
+        fig_corr = px.imshow(corr, text_auto=True, title="Feature Correlations", color_continuous_scale="RdBu")
+        fig_corr.update_layout(
             font=dict(color='#000', size=11),
         
             title=dict(
@@ -632,22 +632,22 @@ elif page == "📊 Data Insights":
             template="plotly_white"
         )
         
-        fig2.update_xaxes(
+        fig_corr.update_xaxes(
             tickfont=dict(color='#000', size=10),
             title=dict(font=dict(color='#000'))
         )
         
-        fig2.update_yaxes(
+        fig_corr.update_yaxes(
             tickfont=dict(color='#000', size=10),
             title=dict(font=dict(color='#000'))
         )
 
         
-        st.plotly_chart(fig, config={'responsive': True}, key="heatmap")
+        st.plotly_chart(fig_corr, config={'responsive': True}, key="heatmap")
 
         st.subheader("Class Balance")
-        fig3 = px.pie(dataset, names="HeartDisease", title="Heart Disease Distribution", labels={0: "Healthy", 1: "Diseased"})
-        fig3.update_layout(
+        fig_class = px.pie(dataset, names="HeartDisease", title="Heart Disease Distribution", labels={0: "Healthy", 1: "Diseased"})
+        fig_class.update_layout(
             font=dict(color='#000', size=12),
         
             title=dict(
@@ -658,7 +658,7 @@ elif page == "📊 Data Insights":
             template="plotly_white"
         )
         
-        fig3.update_traces(
+        fig_class.update_traces(
             textposition='inside',
             textinfo='percent+label',
         
@@ -670,7 +670,7 @@ elif page == "📊 Data Insights":
         
             
 
-        st.plotly_chart(fig3, config={'responsive': True}, key="class")
+        st.plotly_chart(fig_class, config={'responsive': True}, key="class_balance")
 
 # --------------------------
 # PAGE: Model Performance
@@ -769,6 +769,7 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
 
 
 
