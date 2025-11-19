@@ -597,14 +597,37 @@ elif page == "📊 Data Insights":
         fig = px.histogram(dataset, x=feature, nbins=30, title=f"Distribution: {feature}", marginal="box")
         fig.update_layout(
             font=dict(color='#000', size=11),
-            title=dict(font=dict(color='#000', size=14)),
-            xaxis=dict(tickfont=dict(color='#000'), titlefont=dict(color='#000')),
-            yaxis=dict(tickfont=dict(color='#000'), titlefont=dict(color='#000')),
+        
+            title=dict(
+                font=dict(color='#000', size=14)
+            ),
+        
+            xaxis=dict(
+                tickfont=dict(color='#000'),
+                title=dict(font=dict(color='#000'))
+            ),
+        
+            yaxis=dict(
+                tickfont=dict(color='#000'),
+                title=dict(font=dict(color='#000'))
+            ),
+        
             paper_bgcolor='rgba(255,255,255,0.95)',
             plot_bgcolor='rgba(240,240,240,0.5)',
-            hovermode='closest'
+        
+            hovermode='closest',
+            template="plotly_white"   # ← REQUIRED FOR READABILITY
         )
-        fig.update_traces(hoverlabel=dict(bgcolor='white', font_color='black', font_size=11))
+        
+        fig.update_traces(
+            hoverlabel=dict(
+                bgcolor='white',
+                bordercolor='black',
+                font_color='black',
+                font_size=11
+            )
+        )
+
         st.plotly_chart(fig, config={'responsive': True})
 
         st.subheader("Correlation Heatmap")
@@ -612,22 +635,60 @@ elif page == "📊 Data Insights":
         fig2 = px.imshow(corr, text_auto=True, title="Feature Correlations", color_continuous_scale="RdBu")
         fig2.update_layout(
             font=dict(color='#000', size=11),
-            title=dict(font=dict(color='#000', size=14)),
+        
+            title=dict(
+                font=dict(color='#000', size=14)
+            ),
+        
             paper_bgcolor='rgba(255,255,255,0.95)',
-            plot_bgcolor='rgba(255,255,255,0.95)'
+            plot_bgcolor='rgba(255,255,255,0.95)',
+            template="plotly_white"
         )
-        fig2.update_xaxes(tickfont=dict(color='#000', size=10), titlefont=dict(color='#000'))
-        fig2.update_yaxes(tickfont=dict(color='#000', size=10), titlefont=dict(color='#000'))
+        
+        fig2.update_xaxes(
+            tickfont=dict(color='#000', size=10),
+            title=dict(font=dict(color='#000'))
+        )
+        
+        fig2.update_yaxes(
+            tickfont=dict(color='#000', size=10),
+            title=dict(font=dict(color='#000'))
+        )
+
         st.plotly_chart(fig2, config={'responsive': True})
 
         st.subheader("Class Balance")
         fig3 = px.pie(dataset, names="HeartDisease", title="Heart Disease Distribution", labels={0: "Healthy", 1: "Diseased"})
         fig3.update_layout(
             font=dict(color='#000', size=12),
-            title=dict(font=dict(color='#000', size=14)),
-            paper_bgcolor='rgba(255,255,255,0.95)'
+        
+            title=dict(
+                font=dict(color='#000', size=14)
+            ),
+        
+            paper_bgcolor='rgba(255,255,255,0.95)',
+            template="plotly_white"
         )
-        fig3.update_traces(textposition='inside', textinfo='percent+label', textfont=dict(color='#000', size=11), hovertemplate='<b>%{label}</b><br>Count: %{value}<extra></extra>', hoverlabel=dict(bgcolor='white', font_color='black'))
+        
+        fig3.update_traces(
+            textposition='inside',
+            textinfo='percent+label',
+        
+            textfont=dict(
+                color='#000',
+                size=11
+            ),
+        
+            hovertemplate='<b>%{label}</b><br>Count: %{value}<extra></extra>',
+        
+            hoverlabel=dict(
+                bgcolor='white',
+                bordercolor='black',
+                font_color='black',
+                font_size=11
+            )
+        )
+
         st.plotly_chart(fig3, config={'responsive': True})
 
 # --------------------------
@@ -735,6 +796,7 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
 
 
 
