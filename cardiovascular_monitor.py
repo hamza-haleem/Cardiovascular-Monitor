@@ -410,7 +410,7 @@ if page == "📋 Diagnostic Report":
 
                 st.dataframe(
                     summary_display.style.map(highlight_values, subset=["Value"]),
-                    width='stretch'
+                    width=True
                 )
 
             try:
@@ -619,6 +619,7 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
 
 
 
