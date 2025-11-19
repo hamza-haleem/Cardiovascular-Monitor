@@ -159,7 +159,7 @@ def medical_suggestions(input_df):
         if items:
             final_suggestions.append(f"\n**{category}:**")
             for item in items:
-                final_suggestions.append(f"{item}")
+                final_suggestions.append(f" -> {item}")
     
     if not final_suggestions:
         final_suggestions = ["No significant red flags detected. Maintain healthy lifestyle and routine check-ups."]
@@ -482,19 +482,36 @@ if page == "📋 Diagnostic Report":
                                  labels={"value": "Value", "variable": "Group"})
                     # Update layout for visibility: explicit text colors, legend styling
                     fig.update_layout(
-                        template="plotly_white",
-                        font=dict(color='black'),
-                        legend=dict(font=dict(color='black')),
+                        font=dict(color='#000', size=12),
+                        title=dict(font=dict(color='#000', size=16)),
+                    
+                        xaxis=dict(
+                            tickfont=dict(color='#000'),
+                            title=dict(font=dict(color='#000'))
+                        ),
+                    
+                        yaxis=dict(
+                            tickfont=dict(color='#000'),
+                            title=dict(font=dict(color='#000'))
+                        ),
+                    
+                        legend=dict(
+                            font=dict(color='#000', size=11),
+                            bgcolor='rgba(255,255,255,0.7)'
+                        ),
+                    
+                        hovermode='closest',
+                        template="plotly_white"  # ensures everything remains readable
                     )
                     
                     fig.update_traces(
+                        hovertemplate='<b>%{x}</b><br>%{fullData.name}: %{y:.2f}<extra></extra>',
                         hoverlabel=dict(
-                            bgcolor="white",
-                            bordercolor="black",
                             font_color="black",
-                            font_size=13
+                            bgcolor="white"
                         )
                     )
+
                     
 
                     st.plotly_chart(fig, config={'responsive': True})
@@ -688,6 +705,7 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
 
 
 
