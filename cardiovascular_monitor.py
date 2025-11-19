@@ -378,42 +378,40 @@ if page == "📋 Diagnostic Report":
                             file_name="batch_predictions.csv",
                             mime="text/csv"
                         )
-            except Exception as e:
-                st.error(f"❌ Failed to process uploaded CSV: {e}")
-        if st.session_state.prediction_input is not None:
-            input_data = st.session_state.prediction_input
-    # --------------------------
-    # Single prediction
-    # --------------------------
+        except Exception as e:
+            st.error(f"❌ Failed to process uploaded CSV: {e}")
+    if st.session_state.prediction_input is not None:
+        input_data = st.session_state.prediction_input
+   
     
-            st.markdown("### 🧾 Patient Input Summary")
-            with st.expander("View Patient Summary", expanded=False):
-                # Display a simple table (no Styler) for cloud stability
-                icon_map = {
-                    "Age": "👤",
-                    "Sex": "🚻",
-                    "Chest Pain Type": "🫁",
-                    "Resting BP": "🩺",
-                    "Cholesterol": "🧪",
-                    "Fasting BS": "🩸",
-                    "Resting ECG": "🫀",
-                    "Max HR": "💓",
-                    "Exercise Angina": "🏃",
-                    "Oldpeak": "📈",
-                    "ST Slope": "〽️"
-                }
+        st.markdown("### 🧾 Patient Input Summary")
+        with st.expander("View Patient Summary", expanded=False):
+             
+            icon_map = {
+                "Age": "👤",
+                "Sex": "🚻",
+                "Chest Pain Type": "🫁",
+                "Resting BP": "🩺",
+                "Cholesterol": "🧪",
+                "Fasting BS": "🩸",
+                "Resting ECG": "🫀",
+                "Max HR": "💓",
+                "Exercise Angina": "🏃",
+                "Oldpeak": "📈",
+                "ST Slope": "〽️"
+            }
     
-                summary_display = pd.DataFrame({
-                    "Parameter": list(icon_map.keys()),
-                    "Value": [
-                        Age, Sex, ChestPainType, RestingBP, Cholesterol, FastingBS,
-                        RestingECG, MaxHR, ExerciseAngina, Oldpeak, ST_Slope
-                    ],
-                })
+            summary_display = pd.DataFrame({
+                "Parameter": list(icon_map.keys()),
+                "Value": [
+                    Age, Sex, ChestPainType, RestingBP, Cholesterol, FastingBS,
+                    RestingECG, MaxHR, ExerciseAngina, Oldpeak, ST_Slope
+                ],
+            })
     
                 # prepend icons to parameter column
-                summary_display["Parameter"] = summary_display["Parameter"].map(lambda x: f"{icon_map.get(x, '')}  {x}")
-                st.table(summary_display)  # stable display on Cloud
+            summary_display["Parameter"] = summary_display["Parameter"].map(lambda x: f"{icon_map.get(x, '')}  {x}")
+            st.table(summary_display)  # stable display on Cloud
     
             # Run prediction safely
             try:
@@ -673,6 +671,7 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
 
 
 
