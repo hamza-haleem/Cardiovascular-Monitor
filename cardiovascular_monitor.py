@@ -579,30 +579,37 @@ elif page == "📊 Data Insights":
         fig_dist = px.histogram(dataset, x=feature, nbins=30, title=f"Distribution: {feature}", marginal="box")
         fig_dist.update_layout(
             font=dict(color='#000000', size=14),
-            title=dict(font=dict(color='#000000', size=14)),
+        
+            title=dict(
+                font=dict(color='#000000', size=14)
+            ),
+        
             xaxis=dict(
                 tickfont=dict(color='#000000'),
-                titlefont=dict(color='#000000')
+                title=dict(font=dict(color='#000000'))
             ),
+        
             yaxis=dict(
                 tickfont=dict(color='#000000'),
-                titlefont=dict(color='#000000')
+                title=dict(font=dict(color='#000000'))
             ),
+        
             paper_bgcolor='rgba(255,255,255,0)',
             plot_bgcolor='rgba(255,255,255,0)',
+        
             hovermode='closest',
-            template="plotly_white"
+            template="plotly_white"   # ← REQUIRED FOR READABILITY
         )
         
-        # 🔥 Dark/Light Safe Hover Styling
         fig_dist.update_traces(
             hoverlabel=dict(
-                bgcolor="#1E3A8A",    # Royal Blue (HIGH CONTRAST)
-               
-                font_color="#F4F4F4", # Soft white (readable on both themes)
+                bgcolor='#1E3A8A',
+                
+                font_color='#F4F4F4',
                 font_size=14
             )
         )
+
 
 
         
@@ -756,6 +763,7 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
 
 
 
