@@ -385,7 +385,7 @@ if page == "📋 Diagnostic Report":
    
     
         st.markdown("### 🧾 Patient Input Summary")
-        with st.expander("View Patient Summary", expanded=False):
+        with st.expander("View Patient Summary", expanded=True):
              
             icon_map = {
                 "Age": "👤",
@@ -460,7 +460,7 @@ if page == "📋 Diagnostic Report":
                 # Medical suggestions
                 suggestions = medical_suggestions(input_data)
                 st.markdown("### 📑 Clinical Recommendations")
-                with st.expander("View Clinical Recommendations & Risk Factors", expanded=False):
+                with st.expander("View Clinical Recommendations & Risk Factors", expanded=True):
                     for s in suggestions:
                         st.write("" + s)
     
@@ -651,15 +651,45 @@ elif page == "📈 Model Performance":
                 fig = px.bar(melt, x="Model", y="Value", color="Metric", barmode="group", title="Model Comparison")
                 fig.update_layout(
                     font=dict(color='#000', size=12),
-                    title=dict(font=dict(color='#000', size=14)),
-                    xaxis=dict(tickfont=dict(color='#000', size=11), titlefont=dict(color='#000', size=12)),
-                    yaxis=dict(tickfont=dict(color='#000', size=11), titlefont=dict(color='#000', size=12)),
-                    legend=dict(font=dict(color='#000', size=11), bgcolor='rgba(255,255,255,0.9)', bordercolor='#000', borderwidth=1),
-                    paper_bgcolor='rgba(255,255,255,0.95)',
-                    plot_bgcolor='rgba(240,240,240,0.5)',
-                    hovermode='closest'
+                
+                    title=dict(
+                        font=dict(color='#000', size=14)
+                    ),
+                
+                    xaxis=dict(
+                        tickfont=dict(color='#000', size=11),
+                        title=dict(font=dict(color='#000', size=12))
+                    ),
+                
+                    yaxis=dict(
+                        tickfont=dict(color='#000', size=11),
+                        title=dict(font=dict(color='#000', size=12))
+                    ),
+                
+                    legend=dict(
+                        font=dict(color='#000', size=11),
+                        bgcolor='rgba(255,255,255,0.9)',
+                        bordercolor='#000',
+                        borderwidth=1
+                    ),
+                
+                    paper_bgcolor='rgba(255,255,255,0.95)',   # stays white
+                    plot_bgcolor='rgba(240,240,240,0.5)',     # light gray
+                    hovermode='closest',
+                
+                    template="plotly_white"    # CRITICAL for dark-mode readability
                 )
-                fig.update_traces(hovertemplate='<b>%{x}</b><br>%{fullData.name}: %{y:.4f}<extra></extra>', hoverlabel=dict(bgcolor='white', font_color='black', font_size=12))
+                
+                fig.update_traces(
+                    hovertemplate='<b>%{x}</b><br>%{fullData.name}: %{y:.4f}<extra></extra>',
+                    hoverlabel=dict(
+                        bgcolor='white',
+                        bordercolor='black',
+                        font_color='black',
+                        font_size=12
+                    )
+                )
+
                 st.plotly_chart(fig, config={'responsive': True})
         except Exception as e:
             st.error(f"❌ Error reading comparison file: {e}")
@@ -705,6 +735,7 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
 
 
 
