@@ -378,10 +378,10 @@ if page == "📋 Diagnostic Report":
                             file_name="batch_predictions.csv",
                             mime="text/csv"
                         )
-        except Exception as e:
-            st.error(f"❌ Failed to process uploaded CSV: {e}")
-    if st.session_state.prediction_input is not None:
-        input_data = st.session_state.prediction_input
+            except Exception as e:
+                st.error(f"❌ Failed to process uploaded CSV: {e}")
+        if st.session_state.prediction_input is not None:
+            input_data = st.session_state.prediction_input
     # --------------------------
     # Single prediction
     # --------------------------
@@ -673,6 +673,7 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
 
 
 
