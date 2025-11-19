@@ -482,35 +482,20 @@ if page == "📋 Diagnostic Report":
                                  labels={"value": "Value", "variable": "Group"})
                     # Update layout for visibility: explicit text colors, legend styling
                     fig.update_layout(
-                        font=dict(color='#000', size=12),
-                        title=dict(font=dict(color='#000', size=16)),
-                    
-                        xaxis=dict(
-                            tickfont=dict(color='#000'),
-                            title=dict(font=dict(color='#000'))
-                        ),
-                    
-                        yaxis=dict(
-                            tickfont=dict(color='#000'),
-                            title=dict(font=dict(color='#000'))
-                        ),
-                    
-                        legend=dict(
-                            font=dict(color='#000', size=11),
-                            bgcolor='rgba(255,255,255,0.7)'
-                        ),
-                    
-                        hovermode='closest',
-                        template="plotly_white"  # ensures everything remains readable
+                        template="plotly_white",
+                        font=dict(color='black'),
+                        legend=dict(font=dict(color='black')),
                     )
                     
                     fig.update_traces(
-                        hovertemplate='<b>%{x}</b><br>%{fullData.name}: %{y:.2f}<extra></extra>',
                         hoverlabel=dict(
+                            bgcolor="white",
+                            bordercolor="black",
                             font_color="black",
-                            bgcolor="white"
+                            font_size=13
                         )
                     )
+                    
 
                     st.plotly_chart(fig, config={'responsive': True})
                     
@@ -703,6 +688,7 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
 
 
 
