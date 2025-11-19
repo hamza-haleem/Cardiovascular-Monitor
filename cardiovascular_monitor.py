@@ -508,13 +508,13 @@ if page == "📋 Diagnostic Report":
                         hovertemplate='<b>%{x}</b><br>%{fullData.name}: %{y:.2f}<extra></extra>',
                         hoverlabel=dict(
                             font_color="black",
-                            bgcolor="black"
+                            bgcolor="white"
                         )
                     )
 
                     
 
-                    st.plotly_chart(fig, config={'responsive': True})
+                    st.plotly_chart(fig, theme=None, config={'responsive': True})
                     
     
                 # Save single prediction to history
@@ -796,6 +796,7 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
 
 
 
