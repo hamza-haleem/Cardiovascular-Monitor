@@ -499,7 +499,7 @@ if page == "📋 Diagnostic Report":
                             font=dict(color='black', size=12),
                             bgcolor='rgba(255,255,255,0.0)'
                         )
-                    
+                    )
                        
                     
                     
@@ -767,6 +767,7 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
 
 
 
