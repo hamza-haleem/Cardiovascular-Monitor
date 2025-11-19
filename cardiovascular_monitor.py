@@ -665,6 +665,7 @@ elif page == "📊 Data Insights":
                 color='#000',
                 size=11
             )
+        )
         
             
 
@@ -767,6 +768,7 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
 
 
 
