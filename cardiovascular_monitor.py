@@ -484,14 +484,14 @@ if page == "📋 Diagnostic Report":
                     fig.update_layout(
                         template="plotly_white",
                         font=dict(color="#000000"),
-                        paper_bgcolor="rgba(255,255,255,0.3)",
-                        plot_bgcolor="rgba(255,255,255,0.7)"
+                        paper_bgcolor="rgba(255,255,255,0.1)",
+                        plot_bgcolor="rgba(255,255,255,0.1)"
                     )
 
                     fig.update_traces(
                         hoverlabel=dict(
                             bgcolor="#ffffff",   # solid white background
-                            
+                            font_color="#000000",
                             font_size=12
                         )
                     )
@@ -768,6 +768,7 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
 
 
 
