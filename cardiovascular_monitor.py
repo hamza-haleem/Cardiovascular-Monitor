@@ -628,7 +628,7 @@ elif page == "📊 Data Insights":
             )
         )
 
-        st.plotly_chart(fig, config={'responsive': True})
+        st.plotly_chart(fig, theme=None, config={'responsive': True})
 
         st.subheader("Correlation Heatmap")
         corr = dataset[numeric_cols].corr()
@@ -654,12 +654,7 @@ elif page == "📊 Data Insights":
             tickfont=dict(color='#000', size=10),
             title=dict(font=dict(color='#000'))
         )
-        fig2.update_traces(
-            hoverlabel=dict(
-                bgcolor="white",        # Set the hover box background color
-                font_color="black"      # Set the hover text color
-            )
-        )
+        
         st.plotly_chart(fig, theme=None, config={'responsive': True})
 
         st.subheader("Class Balance")
@@ -746,15 +741,7 @@ elif page == "📈 Model Performance":
                     template="plotly_white"    # CRITICAL for dark-mode readability
                 )
                 
-                fig.update_traces(
-                    hovertemplate='<b>%{x}</b><br>%{fullData.name}: %{y:.4f}<extra></extra>',
-                    hoverlabel=dict(
-                        bgcolor='white',
-                        bordercolor='black',
-                        font_color='black',
-                        font_size=12
-                    )
-                )
+                
 
                 st.plotly_chart(fig, config={'responsive': True})
         except Exception as e:
@@ -801,6 +788,7 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
 
 
 
