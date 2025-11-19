@@ -615,7 +615,7 @@ elif page == "📊 Data Insights":
         
         
 
-        st.plotly_chart(fig, config={'responsive': True})
+        st.plotly_chart(fig, config={'responsive': True}, key="featuredis")
 
         st.subheader("Correlation Heatmap")
         corr = dataset[numeric_cols].corr()
@@ -643,7 +643,7 @@ elif page == "📊 Data Insights":
         )
 
         
-        st.plotly_chart(fig, config={'responsive': True})
+        st.plotly_chart(fig, config={'responsive': True}, key="heatmap")
 
         st.subheader("Class Balance")
         fig3 = px.pie(dataset, names="HeartDisease", title="Heart Disease Distribution", labels={0: "Healthy", 1: "Diseased"})
@@ -670,7 +670,7 @@ elif page == "📊 Data Insights":
         
             
 
-        st.plotly_chart(fig3, config={'responsive': True})
+        st.plotly_chart(fig3, config={'responsive': True}, key="class")
 
 # --------------------------
 # PAGE: Model Performance
@@ -769,6 +769,7 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
 
 
 
