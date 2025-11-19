@@ -276,76 +276,84 @@ if page == "📋 Diagnostic Report":
             st.warning(f"⚠️ {warning}")
 
 
-    st.markdown("---") 
-    # Create two columns
+    # --------------------------
+    # PAGE: Prediction (clean, Streamlit-Cloud-safe)
+    # --------------------------
+    st.markdown("---")
     col_predict, col_upload = st.columns([1, 1])
 
     with col_predict:
-        # Use markdown + HTML to make a bigger button
-        st.markdown("""
-        <style>
-        div.stButton > button {
-            width: 100%;
-        }
-        </style>
-        """, unsafe_allow_html=True)
-
         do_predict = st.button("Perform Assessment")
-
 
     with col_upload:
         uploaded_file = st.file_uploader("Upload CSV for batch predictions", type=["csv"])
 
-    # batch predictions
+    # --------------------------
+    # Batch predictions
+    # --------------------------
     if uploaded_file is not None:
         try:
             batch_df = pd.read_csv(uploaded_file)
             st.write("Preview of uploaded data:")
-            st.dataframe(batch_df.head())
-            # Check required columns
-            required = set(numeric_cols + categorical_cols)
-            uploaded_cols = set(batch_df.columns)
-            missing = required - uploaded_cols
-            extra = uploaded_cols - required
-            
-            if missing:
-                st.error(f"❌ CSV missing required columns: {missing}")
-            elif extra:
-                st.warning(f"⚠️ CSV has extra columns that will be ignored: {extra}")
-            
-            if not missing:  # Only proceed if no missing columns
-                if model is None:
-                    st.error("Model not available: cannot perform batch predictions.")
-                else:
-                    try:
-                        batch_df_clean = batch_df[list(required)].copy()
-                        
-                        # Normalize categorical columns for case sensitivity
-                        if "Sex" in batch_df_clean.columns:
-                            batch_df_clean["Sex"] = batch_df_clean["Sex"].astype(str).str.upper()
-                        if "ExerciseAngina" in batch_df_clean.columns:
-                            batch_df_clean["ExerciseAngina"] = batch_df_clean["ExerciseAngina"].astype(str).str.upper()
-                        if "ChestPainType" in batch_df_clean.columns:
-                            batch_df_clean["ChestPainType"] = batch_df_clean["ChestPainType"].astype(str).str.upper()
-                        
-                        with st.spinner("Processing batch predictions..."):
-                            preds = model.predict(batch_df_clean)
-                            probs = model.predict_proba(batch_df_clean)[:,1]
-                        
-                        batch_df["Prediction"] = preds
-                        batch_df["Probability"] = probs
-                        batch_df["RiskCategory"] = batch_df["Probability"].apply(risk_category_from_prob)
-                        st.success("✅ Batch prediction complete.")
-                        st.dataframe(batch_df.head())
-                        csv = batch_df.to_csv(index=False).encode('utf-8')
-                        st.download_button("⬇️ Download Batch Results CSV", data=csv, file_name="batch_predictions.csv", mime="text/csv", width='stretch')
-                        
-                    except Exception as e:
-                        st.error(f"❌ Prediction error during batch processing: {str(e)}")
-        except Exception as e:
-            st.error(f"❌ Failed to process uploaded CSV: {str(e)}")
+            st.dataframe(batch_df.head(), use_container_width=True)
 
+            # required columns as list for deterministic ordering
+            required_list = list(numeric_cols + categorical_cols)
+            required_set = set(required_list)
+            uploaded_cols = set(batch_df.columns)
+            missing = required_set - uploaded_cols
+            extra = uploaded_cols - required_set
+
+           if missing:
+               st.error(f"❌ CSV missing required columns: {sorted(list(missing))}")
+           if extra:
+               st.warning(f"⚠️ CSV has extra columns that will be ignored: {sorted(list(extra))}")
+
+           if not missing:
+               if model is None:
+                   st.error("Model not available: cannot perform batch predictions.")
+               else:
+                   # select only required columns in consistent order
+                   batch_df_clean = batch_df[required_list].copy()
+   
+                   # Normalize categorical columns (case-insensitive)
+                   for col in ["Sex", "ExerciseAngina", "ChestPainType"]:
+                       if col in batch_df_clean.columns:
+                           batch_df_clean[col] = batch_df_clean[col].astype(str).str.upper()
+
+                   with st.spinner("Processing batch predictions..."):
+                       try:
+                          preds = model.predict(batch_df_clean)
+                          # handle case where model.predict_proba may not exist
+                          if hasattr(model, "predict_proba"):
+                              probs = model.predict_proba(batch_df_clean)[:, 1]
+                          else:
+                              # fallback: if model gives decision_function or only classes, set probs to NaN
+                              probs = [float("nan")] * len(preds)
+                       except Exception as e:
+                           st.error(f"❌ Prediction error during batch processing: {e}")
+                           preds, probs = None, None
+
+                   if preds is not None:
+                       batch_df["Prediction"] = preds
+                       batch_df["Probability"] = probs
+                       batch_df["RiskCategory"] = batch_df["Probability"].apply(lambda x: risk_category_from_prob(x) if pd.notna(x) else "Unknown")
+                       st.success("✅ Batch prediction complete.")
+                       st.dataframe(batch_df.head(), use_container_width=True)
+
+                       csv = batch_df.to_csv(index=False).encode("utf-8")
+                       st.download_button(
+                           "⬇️ Download Batch Results CSV",
+                           data=csv,
+                           file_name="batch_predictions.csv",
+                           mime="text/csv"
+                       )
+       except Exception as e:
+           st.error(f"❌ Failed to process uploaded CSV: {e}")
+
+    # --------------------------
     # Single prediction
+    # --------------------------
     if do_predict:
         if model is None:
             st.error("❌ Model not available. Please run training first.")
@@ -363,12 +371,10 @@ if page == "📋 Diagnostic Report":
                 "Oldpeak": Oldpeak,
                 "ST_Slope": ST_Slope
             }])
-
-            # Predict
+    
             st.markdown("### 🧾 Patient Input Summary")
-
             with st.expander("View Patient Summary", expanded=False):
-
+                # Display a simple table (no Styler) for cloud stability
                 icon_map = {
                     "Age": "👤",
                     "Sex": "🚻",
@@ -380,9 +386,9 @@ if page == "📋 Diagnostic Report":
                     "Max HR": "💓",
                     "Exercise Angina": "🏃",
                     "Oldpeak": "📈",
-                    "ST Slope": "〽❤️",
+                    "ST Slope": "〽️"
                 }
-
+    
                 summary_display = pd.DataFrame({
                     "Parameter": list(icon_map.keys()),
                     "Value": [
@@ -390,44 +396,30 @@ if page == "📋 Diagnostic Report":
                         RestingECG, MaxHR, ExerciseAngina, Oldpeak, ST_Slope
                     ],
                 })
-
-                # Convert everything to string for safe display
-                summary_display["Value"] = summary_display["Value"].astype(str)
-
-                # Add icons
-                summary_display["Parameter"] = summary_display["Parameter"].apply(
-                    lambda x: f"{icon_map[x]}  {x}"
-                )
-
-                # Style table
-                def highlight_values(val):
-                    """Color-code numeric vs categorical values"""
-                    try:
-                        float(val)
-                        return "background-color: #3db1d4;"  # light blue for numbers
-                    except:
-                        return "background-color: #24d689;"  # light yellow for categories
-
-                st.dataframe(
-                    summary_display.style.map(highlight_values, subset=["Value"]),
-                    width=True
-                )
-
+    
+                # prepend icons to parameter column
+                summary_display["Parameter"] = summary_display["Parameter"].map(lambda x: f"{icon_map.get(x, '')}  {x}")
+                st.table(summary_display)  # stable display on Cloud
+    
+            # Run prediction safely
             try:
                 with st.spinner("🔄 Processing prediction..."):
                     pred = model.predict(input_data)[0]
-                    prob = model.predict_proba(input_data)[0][1]
+                    if hasattr(model, "predict_proba"):
+                        prob = float(model.predict_proba(input_data)[0][1])
+                    else:
+                        prob = float("nan")
             except Exception as e:
                 st.error(f"❌ Prediction failed: {e}")
                 pred, prob = None, None
-
+    
             if pred is not None:
-                risk = risk_category_from_prob(prob)
-                # Color-coded gauge using Plotly
+                risk = risk_category_from_prob(prob) if pd.notna(prob) else "Unknown"
+                # Plotly gauge (works fine on Streamlit Cloud)
                 color_map = {"Low": "#2ca02c", "Moderate": "#ffcc00", "High": "#d62728"}
                 fig_gauge = go.Figure(go.Indicator(
                     mode="gauge+number",
-                    value=prob*100,
+                    value=(prob * 100) if pd.notna(prob) else 0,
                     domain={'x': [0, 1], 'y': [0, 1]},
                     title={'text': f"Risk Probability: {risk}", 'font': {'size': 18}},
                     gauge={
@@ -445,27 +437,26 @@ if page == "📋 Diagnostic Report":
                         }
                     }
                 ))
-                st.plotly_chart(fig_gauge, config={'responsive': True})
-
+                st.plotly_chart(fig_gauge, use_container_width=True, config={'responsive': True})
+    
                 # Text result
-                if pred == 1:
-                    st.error(f"⚠️ PATIENT IS AT RISK — Probability: {prob*100:.2f}%")
+                if int(pred) == 1:
+                    st.error(f"⚠️ PATIENT IS AT RISK — Probability: {prob*100:.2f}%" if pd.notna(prob) else "⚠️ PATIENT IS AT RISK — Probability: Unknown")
                 else:
-                    st.success(f"✅ PATIENT IS NOT AT RISK — Probability of disease: {prob*100:.2f}%")
-
+                    st.success(f"✅ PATIENT IS NOT AT RISK — Probability of disease: {prob*100:.2f}%" if pd.notna(prob) else "✅ PATIENT IS NOT AT RISK — Probability: Unknown")
+    
                 # Medical suggestions
                 suggestions = medical_suggestions(input_data)
                 st.markdown("### 📑 Clinical Recommendations")
-                with st.expander("### View Clinical Recommendations & Risk Factors", expanded=False):
+                with st.expander("View Clinical Recommendations & Risk Factors", expanded=False):
                     for s in suggestions:
-                        st.write(" " + s)
-
+                        st.write("- " + s)
+    
                 # Comparison chart (Plotly)
-                chart_png = None
                 if dataset is not None:
-                    plot_cols = [c for c in numeric_cols if c not in ['Oldpeak','FastingBS']]
-                    healthy_avg = dataset[dataset["HeartDisease"]==0][plot_cols].mean()
-                    diseased_avg = dataset[dataset["HeartDisease"]==1][plot_cols].mean()
+                    plot_cols = [c for c in numeric_cols if c not in ['Oldpeak', 'FastingBS']]
+                    healthy_avg = dataset[dataset["HeartDisease"] == 0][plot_cols].mean()
+                    diseased_avg = dataset[dataset["HeartDisease"] == 1][plot_cols].mean()
                     patient_vals = input_data[plot_cols].iloc[0].to_dict()
                     viz_df = pd.DataFrame({
                         "Feature": plot_cols,
@@ -473,61 +464,68 @@ if page == "📋 Diagnostic Report":
                         "DiseasedAvg": diseased_avg.values,
                         "Patient": [patient_vals[c] for c in plot_cols]
                     })
-                    fig = px.bar(viz_df, x="Feature", y=["HealthyAvg","DiseasedAvg","Patient"],
+                    fig = px.bar(viz_df, x="Feature", y=["HealthyAvg", "DiseasedAvg", "Patient"],
                                  title="Patient vs Population (Healthy vs Diseased Averages)",
                                  barmode='group',
                                  labels={"value": "Value", "variable": "Group"})
-                    st.plotly_chart(fig, config={'responsive': True})
-                    # convert to png for PDF
-                    try:
-                        chart_png = fig.to_image(format="png", width=900, height=600, scale=2)
-                    except Exception:
-                        chart_png = None
-                   
-
+                    st.plotly_chart(fig, use_container_width=True, config={'responsive': True})
+    
                 # Save single prediction to history
                 hist_row = {
                     "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                     "prediction": int(pred),
-                    "probability": float(prob),
+                    "probability": float(prob) if pd.notna(prob) else None,
                     "risk_category": risk
                 }
-                # add inputs
-                for c in numeric_cols+categorical_cols:
-                    hist_row[c] = input_data[c].iloc[0]
+                for c in (numeric_cols + categorical_cols):
+                    # be safe: default to None if missing
+                    hist_row[c] = input_data[c].iloc[0] if c in input_data.columns else None
+    
                 save_history(hist_row)
-
                 st.success("✅ Prediction saved to history.")
-
-
+    
+    # --------------------------
+    # Prediction History
+    # --------------------------
     st.markdown("---")
     st.subheader("Prediction History")
     history_df = load_history()
     
     if not history_df.empty:
         col_filter1, col_filter2 = st.columns([1, 1])
-        
+    
         with col_filter1:
             risk_filter = st.multiselect("Filter by Risk Category", options=["Low", "Moderate", "High"], default=["Low", "Moderate", "High"])
-        
+    
         with col_filter2:
+            # ensure timestamp column is datetime and drop NaT for min/max
             if "timestamp" in history_df.columns:
                 history_df["timestamp"] = pd.to_datetime(history_df["timestamp"], errors='coerce')
-                date_range = st.date_input("Filter by date range", value=[history_df["timestamp"].min().date(), history_df["timestamp"].max().date()], max_value=None)
-                if len(date_range) == 2:
-                    history_df = history_df[(history_df["timestamp"].dt.date >= date_range[0]) & (history_df["timestamp"].dt.date <= date_range[1])]
-        
+                ts = history_df["timestamp"].dropna()
+                if not ts.empty:
+                    default_range = [ts.min().date(), ts.max().date()]
+                else:
+                    today = datetime.now().date()
+                    default_range = [today, today]
+    
+                date_range = st.date_input("Filter by date range", value=default_range)
+                # date_input returns a single date or two dates; normalize to two dates
+                if isinstance(date_range, (list, tuple)) and len(date_range) == 2:
+                    start_date, end_date = date_range
+                    history_df = history_df[(history_df["timestamp"].dt.date >= start_date) & (history_df["timestamp"].dt.date <= end_date)]
+    
         # Apply risk filter
         if "risk_category" in history_df.columns:
             history_df = history_df[history_df["risk_category"].isin(risk_filter)]
-        
-        st.dataframe(history_df, width='stretch')
-        
+    
+        st.dataframe(history_df, use_container_width=True)
+    
         # Download history
-        csv_history = history_df.to_csv(index=False).encode('utf-8')
+        csv_history = history_df.to_csv(index=False).encode("utf-8")
         st.download_button("⬇️ Download Filtered History", data=csv_history, file_name="prediction_history.csv", mime="text/csv")
     else:
         st.info("No prediction history yet.")
+
 
 # --------------------------
 # PAGE: Data Insights
@@ -621,6 +619,7 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
 
 
 
