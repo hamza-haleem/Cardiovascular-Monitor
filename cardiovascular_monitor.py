@@ -642,12 +642,7 @@ elif page == "📊 Data Insights":
             tickfont=dict(color='#000', size=10),
             title=dict(font=dict(color='#000'))
         )
-        legend=dict(
-            font=dict(color='#000', size=14),
-            bgcolor='rgba(255,255,255,0)',
-            bordercolor='#000',
-            borderwidth=1
-        )
+        
         
         st.plotly_chart(fig_corr, config={'responsive': True}, key="heatmap")
 
@@ -780,6 +775,7 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
 
 
 
