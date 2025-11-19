@@ -504,17 +504,11 @@ if page == "📋 Diagnostic Report":
                         template="plotly_white"  # ensures everything remains readable
                     )
                     
-                    fig.update_traces(
-                        hovertemplate='<b>%{x}</b><br>%{fullData.name}: %{y:.2f}<extra></extra>',
-                        hoverlabel=dict(
-                            font_color="black",
-                            bgcolor="white"
-                        )
-                    )
+                    
 
                     
 
-                    st.plotly_chart(fig, theme=None, config={'responsive': True})
+                    st.plotly_chart(fig, config={'responsive': True})
                     
     
                 # Save single prediction to history
@@ -619,16 +613,9 @@ elif page == "📊 Data Insights":
             template="plotly_white"   # ← REQUIRED FOR READABILITY
         )
         
-        fig.update_traces(
-            hoverlabel=dict(
-                bgcolor='white',
-                bordercolor='black',
-                font_color='black',
-                font_size=11
-            )
-        )
+        
 
-        st.plotly_chart(fig, theme=None, config={'responsive': True})
+        st.plotly_chart(fig, config={'responsive': True})
 
         st.subheader("Correlation Heatmap")
         corr = dataset[numeric_cols].corr()
@@ -655,7 +642,7 @@ elif page == "📊 Data Insights":
             title=dict(font=dict(color='#000'))
         )
         
-        st.plotly_chart(fig, theme=None, config={'responsive': True})
+        st.plotly_chart(fig, config={'responsive': True})
 
         st.subheader("Class Balance")
         fig3 = px.pie(dataset, names="HeartDisease", title="Heart Disease Distribution", labels={0: "Healthy", 1: "Diseased"})
@@ -677,17 +664,9 @@ elif page == "📊 Data Insights":
             textfont=dict(
                 color='#000',
                 size=11
-            ),
-        
-            hovertemplate='<b>%{label}</b><br>Count: %{value}<extra></extra>',
-        
-            hoverlabel=dict(
-                bgcolor='white',
-                bordercolor='black',
-                font_color='black',
-                font_size=11
             )
-        )
+        
+            
 
         st.plotly_chart(fig3, config={'responsive': True})
 
@@ -728,8 +707,8 @@ elif page == "📈 Model Performance":
                     ),
                 
                     legend=dict(
-                        font=dict(color='#000', size=11),
-                        bgcolor='rgba(255,255,255,0.9)',
+                        font=dict(color='#000', size=12),
+                        bgcolor='rgba(255,255,255,0.6)',
                         bordercolor='#000',
                         borderwidth=1
                     ),
@@ -788,6 +767,7 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
 
 
 
