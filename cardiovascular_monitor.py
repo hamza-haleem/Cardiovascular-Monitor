@@ -539,7 +539,9 @@ elif page == "📊 Data Insights":
     if dataset is None:
         st.info("ℹ️ Dataset not found. Place 'heart.csv' in the working directory.")
     else:
-        
+        st.subheader("Dataset Overview")
+        st.dataframe(dataset.head(10), width='stretch')
+        st.write(f"Total records: {len(dataset)} | Total features: {len(dataset.columns)}")
 
         st.subheader("Feature Distributions")
         feature = st.selectbox("Choose feature to analyze", options=numeric_cols, index=0)
@@ -619,6 +621,7 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
 
 
 
