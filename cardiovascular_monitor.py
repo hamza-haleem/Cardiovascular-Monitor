@@ -621,32 +621,27 @@ elif page == "📊 Data Insights":
         corr = dataset[numeric_cols].corr()
         fig_corr = px.imshow(corr, text_auto=True, title="Feature Correlations", color_continuous_scale="RdBu")
         fig_corr.update_layout(
-            font=dict(color="#000000", size=14),
-            title=dict(font=dict(color="#000000", size=14)),
-            paper_bgcolor="rgba(255,255,255,0)",
-            plot_bgcolor="rgba(255,255,255,0)",
+            font=dict(color='#000000', size=14),
+        
+            title=dict(
+                font=dict(color='#000000', size=14)
+            ),
+        
+            paper_bgcolor='rgba(255,255,255,0)',
+            plot_bgcolor='rgba(255,255,255,0)',
             template="plotly_white"
         )
         
         fig_corr.update_xaxes(
-            tickfont=dict(color="#000000", size=14),
-            titlefont=dict(color="#000000")
+            tickfont=dict(color='#000000', size=14),
+            title=dict(font=dict(color='#000000'))
         )
         
         fig_corr.update_yaxes(
-            tickfont=dict(color="#000000", size=14),
-            titlefont=dict(color="#000000")
+            tickfont=dict(color='#000000', size=14),
+            title=dict(font=dict(color='#000000'))
         )
-        
-        # 🔥 KEY PART — Fix hover for light + dark mode (best contrast)
-        fig_corr.update_traces(
-            hoverlabel=dict(
-                bgcolor="#1E3A8A",   # royal blue (great contrast)
-                font_color="#F4F4F4", # soft white text
-                font_size=14,
-                
-            )
-        )
+
 
         
         
@@ -763,6 +758,7 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
 
 
 
