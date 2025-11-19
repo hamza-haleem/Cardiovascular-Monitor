@@ -640,7 +640,7 @@ elif page == "📊 Data Insights":
         fig_corr.update_yaxes(
             tickfont=dict(color='#000000', size=14),
             title=dict(font=dict(color='#000000'))
-        
+        )
         fig_corr.update_traces(
             hoverlabel=dict(
                 bgcolor="#1E3A8A",   # royal blue (great contrast)
@@ -766,6 +766,7 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
 
 
 
