@@ -301,7 +301,23 @@ if page == "📋 Diagnostic Report":
     
     with col_upload:
         uploaded_file = st.file_uploader("Upload CSV for batch predictions", type=["csv"])
-    
+    current_input = pd.DataFrame([{
+        "Age": Age,
+        "Sex": Sex,
+        "ChestPainType": ChestPainType,
+        "RestingBP": RestingBP,
+        "Cholesterol": Cholesterol,
+        "FastingBS": FastingBS,
+        "RestingECG": RestingECG,
+        "MaxHR": MaxHR,
+        "ExerciseAngina": ExerciseAngina,
+        "Oldpeak": Oldpeak,
+        "ST_Slope": ST_Slope
+    }])
+
+    if do_predict:
+        st.session_state.prediction_input = current_input
+        st.session_state.prediction_result = None
     # --------------------------
     # Batch predictions
     # --------------------------
@@ -369,26 +385,7 @@ if page == "📋 Diagnostic Report":
     # --------------------------
     # Single prediction
     # --------------------------
-    if do_predict:
-        if model is None:
-            st.error("❌ Model not available. Please run training first.")
-        else:
-            input_data = pd.DataFrame([{
-                "Age": Age,
-                "Sex": Sex,
-                "ChestPainType": ChestPainType,
-                "RestingBP": RestingBP,
-                "Cholesterol": Cholesterol,
-                "FastingBS": FastingBS,
-                "RestingECG": RestingECG,
-                "MaxHR": MaxHR,
-                "ExerciseAngina": ExerciseAngina,
-                "Oldpeak": Oldpeak,
-                "ST_Slope": ST_Slope
-            }])
-            if do_predict:
-                st.session_state.prediction_input = current_input
-                st.session_state.prediction_result = None
+    
             st.markdown("### 🧾 Patient Input Summary")
             with st.expander("View Patient Summary", expanded=False):
                 # Display a simple table (no Styler) for cloud stability
@@ -676,6 +673,7 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
 
 
 
