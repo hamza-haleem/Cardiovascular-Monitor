@@ -573,11 +573,15 @@ elif page == "📊 Data Insights":
         feature = st.selectbox("Choose feature to analyze", options=numeric_cols, index=0)
         fig = px.histogram(dataset, x=feature, nbins=30, title=f"Distribution: {feature}", marginal="box")
         fig.update_layout(
-            font=dict(color='#000'),
-            title=dict(font=dict(color='#000')),
+            font=dict(color='#000', size=11),
+            title=dict(font=dict(color='#000', size=14)),
             xaxis=dict(tickfont=dict(color='#000'), titlefont=dict(color='#000')),
-            yaxis=dict(tickfont=dict(color='#000'), titlefont=dict(color='#000'))
+            yaxis=dict(tickfont=dict(color='#000'), titlefont=dict(color='#000')),
+            paper_bgcolor='rgba(255,255,255,0.95)',
+            plot_bgcolor='rgba(240,240,240,0.5)',
+            hovermode='closest'
         )
+        fig.update_traces(hoverlabel=dict(bgcolor='white', font_color='black', font_size=11))
         st.plotly_chart(fig, config={'responsive': True})
 
         st.subheader("Correlation Heatmap")
@@ -585,18 +589,22 @@ elif page == "📊 Data Insights":
         fig2 = px.imshow(corr, text_auto=True, title="Feature Correlations", color_continuous_scale="RdBu")
         fig2.update_layout(
             font=dict(color='#000', size=11),
-            title=dict(font=dict(color='#000'))
+            title=dict(font=dict(color='#000', size=14)),
+            paper_bgcolor='rgba(255,255,255,0.95)',
+            plot_bgcolor='rgba(255,255,255,0.95)'
         )
-        fig2.update_traces(text=fig2.data[0].text, hovertemplate='%{x}<br>%{y}<br>%{text:.2f}<extra></extra>')
+        fig2.update_xaxes(tickfont=dict(color='#000', size=10), titlefont=dict(color='#000'))
+        fig2.update_yaxes(tickfont=dict(color='#000', size=10), titlefont=dict(color='#000'))
         st.plotly_chart(fig2, config={'responsive': True})
 
         st.subheader("Class Balance")
         fig3 = px.pie(dataset, names="HeartDisease", title="Heart Disease Distribution", labels={0: "Healthy", 1: "Diseased"})
         fig3.update_layout(
             font=dict(color='#000', size=12),
-            title=dict(font=dict(color='#000'))
+            title=dict(font=dict(color='#000', size=14)),
+            paper_bgcolor='rgba(255,255,255,0.95)'
         )
-        fig3.update_traces(textposition='inside', textinfo='percent+label', hovertemplate='<b>%{label}</b><br>Count: %{value}<extra></extra>')
+        fig3.update_traces(textposition='inside', textinfo='percent+label', textfont=dict(color='#000', size=11), hovertemplate='<b>%{label}</b><br>Count: %{value}<extra></extra>', hoverlabel=dict(bgcolor='white', font_color='black'))
         st.plotly_chart(fig3, config={'responsive': True})
 
 # --------------------------
@@ -620,12 +628,15 @@ elif page == "📈 Model Performance":
                 fig = px.bar(melt, x="Model", y="Value", color="Metric", barmode="group", title="Model Comparison")
                 fig.update_layout(
                     font=dict(color='#000', size=12),
-                    title=dict(font=dict(color='#000')),
-                    xaxis=dict(tickfont=dict(color='#000'), titlefont=dict(color='#000')),
-                    yaxis=dict(tickfont=dict(color='#000'), titlefont=dict(color='#000')),
-                    legend=dict(font=dict(color='#000'), bgcolor='rgba(255,255,255,0.7)')
+                    title=dict(font=dict(color='#000', size=14)),
+                    xaxis=dict(tickfont=dict(color='#000', size=11), titlefont=dict(color='#000', size=12)),
+                    yaxis=dict(tickfont=dict(color='#000', size=11), titlefont=dict(color='#000', size=12)),
+                    legend=dict(font=dict(color='#000', size=11), bgcolor='rgba(255,255,255,0.9)', bordercolor='#000', borderwidth=1),
+                    paper_bgcolor='rgba(255,255,255,0.95)',
+                    plot_bgcolor='rgba(240,240,240,0.5)',
+                    hovermode='closest'
                 )
-                fig.update_traces(hovertemplate='<b>%{x}</b><br>%{fullData.name}: %{y:.4f}<extra></extra>')
+                fig.update_traces(hovertemplate='<b>%{x}</b><br>%{fullData.name}: %{y:.4f}<extra></extra>', hoverlabel=dict(bgcolor='white', font_color='black', font_size=12))
                 st.plotly_chart(fig, config={'responsive': True})
         except Exception as e:
             st.error(f"❌ Error reading comparison file: {e}")
@@ -671,6 +682,7 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
 
 
 
