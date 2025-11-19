@@ -281,13 +281,13 @@ if page == "📋 Diagnostic Report":
     # --------------------------
     st.markdown("---")
     col_predict, col_upload = st.columns([1, 1])
-
+    
     with col_predict:
         do_predict = st.button("Perform Assessment")
-
+    
     with col_upload:
         uploaded_file = st.file_uploader("Upload CSV for batch predictions", type=["csv"])
-
+    
     # --------------------------
     # Batch predictions
     # --------------------------
@@ -296,61 +296,61 @@ if page == "📋 Diagnostic Report":
             batch_df = pd.read_csv(uploaded_file)
             st.write("Preview of uploaded data:")
             st.dataframe(batch_df.head(), use_container_width=True)
-
+    
             # required columns as list for deterministic ordering
             required_list = list(numeric_cols + categorical_cols)
             required_set = set(required_list)
             uploaded_cols = set(batch_df.columns)
             missing = required_set - uploaded_cols
             extra = uploaded_cols - required_set
-
-           if missing:
-               st.error(f"❌ CSV missing required columns: {sorted(list(missing))}")
-           if extra:
-               st.warning(f"⚠️ CSV has extra columns that will be ignored: {sorted(list(extra))}")
-
-           if not missing:
-               if model is None:
-                   st.error("Model not available: cannot perform batch predictions.")
-               else:
-                   # select only required columns in consistent order
-                   batch_df_clean = batch_df[required_list].copy()
-   
-                   # Normalize categorical columns (case-insensitive)
-                   for col in ["Sex", "ExerciseAngina", "ChestPainType"]:
-                       if col in batch_df_clean.columns:
-                           batch_df_clean[col] = batch_df_clean[col].astype(str).str.upper()
-
-                   with st.spinner("Processing batch predictions..."):
-                       try:
-                          preds = model.predict(batch_df_clean)
-                          # handle case where model.predict_proba may not exist
-                          if hasattr(model, "predict_proba"):
-                              probs = model.predict_proba(batch_df_clean)[:, 1]
-                          else:
-                              # fallback: if model gives decision_function or only classes, set probs to NaN
-                              probs = [float("nan")] * len(preds)
-                       except Exception as e:
-                           st.error(f"❌ Prediction error during batch processing: {e}")
-                           preds, probs = None, None
-
-                   if preds is not None:
-                       batch_df["Prediction"] = preds
-                       batch_df["Probability"] = probs
-                       batch_df["RiskCategory"] = batch_df["Probability"].apply(lambda x: risk_category_from_prob(x) if pd.notna(x) else "Unknown")
-                       st.success("✅ Batch prediction complete.")
-                       st.dataframe(batch_df.head(), use_container_width=True)
-
-                       csv = batch_df.to_csv(index=False).encode("utf-8")
-                       st.download_button(
-                           "⬇️ Download Batch Results CSV",
-                           data=csv,
-                           file_name="batch_predictions.csv",
-                           mime="text/csv"
-                       )
-       except Exception as e:
-           st.error(f"❌ Failed to process uploaded CSV: {e}")
-
+    
+            if missing:
+                st.error(f"❌ CSV missing required columns: {sorted(list(missing))}")
+            if extra:
+                st.warning(f"⚠️ CSV has extra columns that will be ignored: {sorted(list(extra))}")
+    
+            if not missing:
+                if model is None:
+                    st.error("Model not available: cannot perform batch predictions.")
+                else:
+                    # select only required columns in consistent order
+                    batch_df_clean = batch_df[required_list].copy()
+    
+                    # Normalize categorical columns (case-insensitive)
+                    for col in ["Sex", "ExerciseAngina", "ChestPainType"]:
+                        if col in batch_df_clean.columns:
+                            batch_df_clean[col] = batch_df_clean[col].astype(str).str.upper()
+    
+                    with st.spinner("Processing batch predictions..."):
+                        try:
+                            preds = model.predict(batch_df_clean)
+                            # handle case where model.predict_proba may not exist
+                            if hasattr(model, "predict_proba"):
+                                probs = model.predict_proba(batch_df_clean)[:, 1]
+                            else:
+                                # fallback: if model gives decision_function or only classes, set probs to NaN
+                                probs = [float("nan")] * len(preds)
+                        except Exception as e:
+                            st.error(f"❌ Prediction error during batch processing: {e}")
+                            preds, probs = None, None
+    
+                    if preds is not None:
+                        batch_df["Prediction"] = preds
+                        batch_df["Probability"] = probs
+                        batch_df["RiskCategory"] = batch_df["Probability"].apply(lambda x: risk_category_from_prob(x) if pd.notna(x) else "Unknown")
+                        st.success("✅ Batch prediction complete.")
+                        st.dataframe(batch_df.head(), use_container_width=True)
+    
+                        csv = batch_df.to_csv(index=False).encode("utf-8")
+                        st.download_button(
+                            "⬇️ Download Batch Results CSV",
+                            data=csv,
+                            file_name="batch_predictions.csv",
+                            mime="text/csv"
+                        )
+        except Exception as e:
+            st.error(f"❌ Failed to process uploaded CSV: {e}")
+    
     # --------------------------
     # Single prediction
     # --------------------------
@@ -527,6 +527,7 @@ if page == "📋 Diagnostic Report":
         st.info("No prediction history yet.")
 
 
+
 # --------------------------
 # PAGE: Data Insights
 # --------------------------
@@ -619,6 +620,7 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
 
 
 
