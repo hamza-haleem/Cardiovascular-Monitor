@@ -653,7 +653,9 @@ elif page == "📊 Data Insights":
             ),
             legend=dict(
                 font=dict(color='#000', size=14),
-                bgcolor='rgba(255,255,255,0.0)'
+                bgcolor='rgba(0,0,0,0.0)',
+                bordercolor='#000',
+                borderwidth=1
             ),
             paper_bgcolor='rgba(255,255,255,0.95)',
             template="plotly_white"
@@ -770,6 +772,7 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
 
 
 
