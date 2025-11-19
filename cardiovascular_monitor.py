@@ -651,7 +651,10 @@ elif page == "📊 Data Insights":
             title=dict(
                 font=dict(color='#000', size=14)
             ),
-        
+            legend=dict(
+                font=dict(color='#000', size=14),
+                bgcolor='rgba(255,255,255,0.0)'
+            ),
             paper_bgcolor='rgba(255,255,255,0.95)',
             template="plotly_white"
         )
@@ -707,8 +710,8 @@ elif page == "📈 Model Performance":
                     ),
                 
                     legend=dict(
-                        font=dict(color='#000', size=12),
-                        bgcolor='rgba(255,255,255,0.6)',
+                        font=dict(color='#000', size=14),
+                        bgcolor='rgba(255,255,255,0.0)',
                         bordercolor='#000',
                         borderwidth=1
                     ),
@@ -767,6 +770,7 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
 
 
 
