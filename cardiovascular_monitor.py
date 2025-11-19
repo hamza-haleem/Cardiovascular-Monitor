@@ -654,8 +654,13 @@ elif page == "📊 Data Insights":
             tickfont=dict(color='#000', size=10),
             title=dict(font=dict(color='#000'))
         )
-
-        st.plotly_chart(fig2, config={'responsive': True})
+        fig2.update_traces(
+            hoverlabel=dict(
+                bgcolor="white",        # Set the hover box background color
+                font_color="black"      # Set the hover text color
+            )
+        )
+        st.plotly_chart(fig, theme=None, config={'responsive': True})
 
         st.subheader("Class Balance")
         fig3 = px.pie(dataset, names="HeartDisease", title="Heart Disease Distribution", labels={0: "Healthy", 1: "Diseased"})
@@ -796,6 +801,7 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
 
 
 
