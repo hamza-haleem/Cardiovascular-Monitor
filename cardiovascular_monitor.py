@@ -496,13 +496,11 @@ if page == "📋 Diagnostic Report":
                         ),
                     
                         legend=dict(
-                            font=dict(color='black', size=11),
+                            font=dict(color='black', size=12),
                             bgcolor='rgba(255,255,255,0.0)'
-                        ),
+                        )
                     
-                        hovermode='closest',
-                        template="plotly_white"  # ensures everything remains readable
-                    )
+                       
                     
                     
 
@@ -769,6 +767,7 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
 
 
 
