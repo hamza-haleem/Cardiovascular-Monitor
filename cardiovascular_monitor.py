@@ -491,7 +491,7 @@ if page == "📋 Diagnostic Report":
                     fig.update_traces(
                         hoverlabel=dict(
                             bgcolor="#1B3A2A",     
-                            fontcolor="#CCFF66",   
+                            font_color="#CCFF66",   
                             font_size=14
                         )
                     )
@@ -768,6 +768,7 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
 
 
 
