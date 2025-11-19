@@ -482,34 +482,27 @@ if page == "📋 Diagnostic Report":
                                  labels={"value": "Value", "variable": "Group"})
                     # Update layout for visibility: explicit text colors, legend styling
                     fig.update_layout(
-                        font=dict(color='#000', size=12),
-                        title=dict(font=dict(color='#000', size=16)),
-                    
-                        xaxis=dict(
-                            tickfont=dict(color='#000'),
-                            title=dict(font=dict(color='#000'))
-                        ),
-                    
-                        yaxis=dict(
-                            tickfont=dict(color='#000'),
-                            title=dict(font=dict(color='#000'))
-                        ),
-                    
-                        legend=dict(
-                            font=dict(color='#000', size=14),
-                            bgcolor='rgba(255,255,255,0)',
-                            bordercolor='#000',
-                            borderwidth=1
-            
+                        template="plotly_white",
+                        font=dict(color="#000"),
+                        paper_bgcolor="rgba(255,255,255,1)",
+                        plot_bgcolor="rgba(255,255,255,0.98)"
+                    )
+
+                    fig.update_traces(
+                        hoverlabel=dict(
+                            bgcolor="#ffffff",   # solid white background
+                            font_color="#000000",  # solid black text
+                            font_size=12
                         )
                     )
+
                        
                     
                     
 
                     
 
-                    st.plotly_chart(fig, config={'responsive': True})
+                    st.plotly_chart(fig, theme=None, config={'responsive': True})
                     
     
                 # Save single prediction to history
@@ -775,6 +768,7 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
 
 
 
