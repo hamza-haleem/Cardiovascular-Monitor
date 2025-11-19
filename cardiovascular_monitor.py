@@ -496,12 +496,6 @@ if page == "📋 Diagnostic Report":
                         )
                     )
 
-                       
-                    
-                    
-
-                    
-
                     st.plotly_chart(fig, theme=None, config={'responsive': True})
                     
     
@@ -583,93 +577,65 @@ elif page == "📊 Data Insights":
         st.subheader("Feature Distributions")
         feature = st.selectbox("Choose feature to analyze", options=numeric_cols, index=0)
         fig_dist = px.histogram(dataset, x=feature, nbins=30, title=f"Distribution: {feature}", marginal="box")
-        fig_dist.update_layout(
-            font=dict(color='#000', size=11),
-        
-            title=dict(
-                font=dict(color='#000', size=14)
-            ),
-        
-            xaxis=dict(
-                tickfont=dict(color='#000'),
-                title=dict(font=dict(color='#000'))
-            ),
-        
-            yaxis=dict(
-                tickfont=dict(color='#000'),
-                title=dict(font=dict(color='#000'))
-            ),
-        
-            paper_bgcolor='rgba(255,255,255,0.95)',
-            plot_bgcolor='rgba(240,240,240,0.5)',
-        
-            hovermode='closest',
-            template="plotly_white"   # ← REQUIRED FOR READABILITY
+        fig.update_layout(
+            template="plotly_white",
+            font=dict(color="#000000"),
+            paper_bgcolor="rgba(255,255,255,0)",
+            plot_bgcolor="rgba(255,255,255,0)"
+        )
+
+        fig.update_traces(
+            hoverlabel=dict(
+                bgcolor="#1E3A8A",     
+                font_color="#F4F4F4",   
+                font_size=14
+            )
         )
         
         
 
-        st.plotly_chart(fig_dist, config={'responsive': True}, key="featuredist")
+        st.plotly_chart(fig_dist, theme=None, config={'responsive': True}, key="featuredist")
 
         st.subheader("Correlation Heatmap")
         corr = dataset[numeric_cols].corr()
         fig_corr = px.imshow(corr, text_auto=True, title="Feature Correlations", color_continuous_scale="RdBu")
-        fig_corr.update_layout(
-            font=dict(color='#000', size=11),
-        
-            title=dict(
-                font=dict(color='#000', size=14)
-            ),
-        
-            paper_bgcolor='rgba(255,255,255,0.95)',
-            plot_bgcolor='rgba(255,255,255,0.95)',
-            template="plotly_white"
+        fig.update_layout(
+            template="plotly_white",
+            font=dict(color="#000000"),
+            paper_bgcolor="rgba(255,255,255,0)",
+            plot_bgcolor="rgba(255,255,255,0)"
         )
-        
-        fig_corr.update_xaxes(
-            tickfont=dict(color='#000', size=10),
-            title=dict(font=dict(color='#000'))
-        )
-        
-        fig_corr.update_yaxes(
-            tickfont=dict(color='#000', size=10),
-            title=dict(font=dict(color='#000'))
-        )
-        
-        
-        st.plotly_chart(fig_corr, config={'responsive': True}, key="heatmap")
 
-        st.subheader("Class Balance")
-        fig_class = px.pie(dataset, names="HeartDisease", title="Heart Disease Distribution", labels={0: "Healthy", 1: "Diseased"})
-        fig_class.update_layout(
-            font=dict(color='#000', size=12),
-        
-            title=dict(
-                font=dict(color='#000', size=14)
-            ),
-            legend=dict(
-                font=dict(color='#000', size=14),
-                bgcolor='rgba(255,255,255,0)',
-                bordercolor='#000',
-                borderwidth=1
-            ),
-            paper_bgcolor='rgba(255,255,255,0.95)',
-            template="plotly_white"
-        )
-        
-        fig_class.update_traces(
-            textposition='inside',
-            textinfo='percent+label',
-        
-            textfont=dict(
-                color='#000',
-                size=11
+        fig.update_traces(
+            hoverlabel=dict(
+                bgcolor="#1E3A8A",     
+                font_color="#F4F4F4",   
+                font_size=14
             )
         )
         
+        
+        st.plotly_chart(fig_corr, theme=None, config={'responsive': True}, key="heatmap")
+
+        st.subheader("Class Balance")
+        fig_class = px.pie(dataset, names="HeartDisease", title="Heart Disease Distribution", labels={0: "Healthy", 1: "Diseased"})
+        fig.update_layout(
+            template="plotly_white",
+            font=dict(color="#000000"),
+            paper_bgcolor="rgba(255,255,255,0)",
+            plot_bgcolor="rgba(255,255,255,0)"
+        )
+
+        fig.update_traces(
+            hoverlabel=dict(
+                bgcolor="#1E3A8A",     
+                font_color="#F4F4F4",   
+                font_size=14
+            )
+        )
             
 
-        st.plotly_chart(fig_class, config={'responsive': True}, key="class_balance")
+        st.plotly_chart(fig_class, theme=None, config={'responsive': True}, key="class_balance")
 
 # --------------------------
 # PAGE: Model Performance
@@ -691,39 +657,23 @@ elif page == "📈 Model Performance":
                 melt = comp.melt(id_vars="Model", value_vars=metric_cols, var_name="Metric", value_name="Value")
                 fig = px.bar(melt, x="Model", y="Value", color="Metric", barmode="group", title="Model Comparison")
                 fig.update_layout(
-                    font=dict(color='#000', size=12),
-                
-                    title=dict(
-                        font=dict(color='#000', size=14)
-                    ),
-                
-                    xaxis=dict(
-                        tickfont=dict(color='#000', size=11),
-                        title=dict(font=dict(color='#000', size=12))
-                    ),
-                
-                    yaxis=dict(
-                        tickfont=dict(color='#000', size=11),
-                        title=dict(font=dict(color='#000', size=12))
-                    ),
-                
-                    legend=dict(
-                        font=dict(color='#000', size=14),
-                        bgcolor='rgba(255,255,255,0)',
-                        bordercolor='#000',
-                        borderwidth=1
-                    ),
-                
-                    paper_bgcolor='rgba(255,255,255,0.95)',   # stays white
-                    plot_bgcolor='rgba(240,240,240,0.5)',     # light gray
-                    hovermode='closest',
-                
-                    template="plotly_white"    # CRITICAL for dark-mode readability
+                    template="plotly_white",
+                    font=dict(color="#000000"),
+                    paper_bgcolor="rgba(255,255,255,0)",
+                    plot_bgcolor="rgba(255,255,255,0)"
+                )
+
+                fig.update_traces(
+                    hoverlabel=dict(
+                        bgcolor="#1E3A8A",     
+                        font_color="#F4F4F4",   
+                        font_size=14
+                    )
                 )
                 
                 
 
-                st.plotly_chart(fig, config={'responsive': True})
+                st.plotly_chart(fig, theme=None, config={'responsive': True})
         except Exception as e:
             st.error(f"❌ Error reading comparison file: {e}")
 
@@ -768,6 +718,7 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
 
 
 
