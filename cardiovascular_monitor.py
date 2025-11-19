@@ -577,20 +577,34 @@ elif page == "📊 Data Insights":
         st.subheader("Feature Distributions")
         feature = st.selectbox("Choose feature to analyze", options=numeric_cols, index=0)
         fig_dist = px.histogram(dataset, x=feature, nbins=30, title=f"Distribution: {feature}", marginal="box")
-        fig.update_layout(
-            template="plotly_white",
-            font=dict(color="#000000"),
-            paper_bgcolor="rgba(255,255,255,0)",
-            plot_bgcolor="rgba(255,255,255,0)"
+        fig_dist.update_layout(
+            font=dict(color='#000000', size=14),
+            title=dict(font=dict(color='#000000', size=14)),
+            xaxis=dict(
+                tickfont=dict(color='#000000'),
+                titlefont=dict(color='#000000')
+            ),
+            yaxis=dict(
+                tickfont=dict(color='#000000'),
+                titlefont=dict(color='#000000')
+            ),
+            paper_bgcolor='rgba(255,255,255,0)',
+            plot_bgcolor='rgba(255,255,255,0)',
+            hovermode='closest',
+            template="plotly_white"
         )
-
-        fig.update_traces(
+        
+        # 🔥 Dark/Light Safe Hover Styling
+        fig_dist.update_traces(
             hoverlabel=dict(
-                bgcolor="#1E3A8A",     
-                font_color="#F4F4F4",   
+                bgcolor="#1E3A8A",    # Royal Blue (HIGH CONTRAST)
+               
+                font_color="#F4F4F4", # Soft white (readable on both themes)
                 font_size=14
             )
         )
+
+
         
         
 
@@ -599,40 +613,64 @@ elif page == "📊 Data Insights":
         st.subheader("Correlation Heatmap")
         corr = dataset[numeric_cols].corr()
         fig_corr = px.imshow(corr, text_auto=True, title="Feature Correlations", color_continuous_scale="RdBu")
-        fig.update_layout(
-            template="plotly_white",
-            font=dict(color="#000000"),
+        fig_corr.update_layout(
+            font=dict(color="#000000", size=14),
+            title=dict(font=dict(color="#000000", size=14)),
             paper_bgcolor="rgba(255,255,255,0)",
-            plot_bgcolor="rgba(255,255,255,0)"
+            plot_bgcolor="rgba(255,255,255,0)",
+            template="plotly_white"
         )
-
-        fig.update_traces(
+        
+        fig_corr.update_xaxes(
+            tickfont=dict(color="#000000", size=14),
+            titlefont=dict(color="#000000")
+        )
+        
+        fig_corr.update_yaxes(
+            tickfont=dict(color="#000000", size=14),
+            titlefont=dict(color="#000000")
+        )
+        
+        # 🔥 KEY PART — Fix hover for light + dark mode (best contrast)
+        fig_corr.update_traces(
             hoverlabel=dict(
-                bgcolor="#1E3A8A",     
-                font_color="#F4F4F4",   
-                font_size=14
+                bgcolor="#1E3A8A",   # royal blue (great contrast)
+                font_color="#F4F4F4", # soft white text
+                font_size=14,
+                
             )
         )
+
         
         
         st.plotly_chart(fig_corr, theme=None, config={'responsive': True}, key="heatmap")
 
         st.subheader("Class Balance")
         fig_class = px.pie(dataset, names="HeartDisease", title="Heart Disease Distribution", labels={0: "Healthy", 1: "Diseased"})
-        fig.update_layout(
-            template="plotly_white",
-            font=dict(color="#000000"),
-            paper_bgcolor="rgba(255,255,255,0)",
-            plot_bgcolor="rgba(255,255,255,0)"
+        fig_class.update_layout(
+            font=dict(color='#000000', size=14),
+            title=dict(font=dict(color='#000000', size=14)),
+            paper_bgcolor='rgba(255,255,255,0)',
+            template="plotly_white"
         )
-
-        fig.update_traces(
+        
+        fig_class.update_traces(
+            textposition='inside',
+            textinfo='percent+label',
+            textfont=dict(color='#000000', size=14),
+        
+            hovertemplate='<b>%{label}</b><br>Count: %{value}<extra></extra>',
+        
+            # 🔥 Dark/Light Safe Hover Styling
             hoverlabel=dict(
-                bgcolor="#1E3A8A",     
-                font_color="#F4F4F4",   
+                bgcolor="#1E3A8A",    # Royal Blue
+                
+                font_color="#F4F4F4", # Soft white
                 font_size=14
             )
         )
+
+
             
 
         st.plotly_chart(fig_class, theme=None, config={'responsive': True}, key="class_balance")
@@ -718,6 +756,7 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
 
 
 
