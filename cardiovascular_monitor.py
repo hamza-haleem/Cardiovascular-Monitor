@@ -496,8 +496,11 @@ if page == "📋 Diagnostic Report":
                         ),
                     
                         legend=dict(
-                            font=dict(color='black', size=14),
-                            bgcolor='rgba(255,255,255,0.0)'
+                            font=dict(color='#000', size=14),
+                            bgcolor='rgba(255,255,255,0)',
+                            bordercolor='#000',
+                            borderwidth=1
+            
                         )
                     )
                        
@@ -639,7 +642,12 @@ elif page == "📊 Data Insights":
             tickfont=dict(color='#000', size=10),
             title=dict(font=dict(color='#000'))
         )
-
+        legend=dict(
+            font=dict(color='#000', size=14),
+            bgcolor='rgba(255,255,255,0)',
+            bordercolor='#000',
+            borderwidth=1
+        )
         
         st.plotly_chart(fig_corr, config={'responsive': True}, key="heatmap")
 
@@ -653,7 +661,7 @@ elif page == "📊 Data Insights":
             ),
             legend=dict(
                 font=dict(color='#000', size=14),
-                bgcolor='rgba(0,0,0,0.0)',
+                bgcolor='rgba(255,255,255,0)',
                 bordercolor='#000',
                 borderwidth=1
             ),
@@ -713,7 +721,7 @@ elif page == "📈 Model Performance":
                 
                     legend=dict(
                         font=dict(color='#000', size=14),
-                        bgcolor='rgba(255,255,255,0.0)',
+                        bgcolor='rgba(255,255,255,0)',
                         bordercolor='#000',
                         borderwidth=1
                     ),
@@ -772,6 +780,7 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
 
 
 
