@@ -642,7 +642,7 @@ elif page == "📊 Data Insights":
             title=dict(font=dict(color='#000'))
         )
         
-        st.plotly_chart(fig, config={'responsive': True})
+        st.plotly_chart(fig, config={'responsive': True}, key="heatmap")
 
         st.subheader("Class Balance")
         fig3 = px.pie(dataset, names="HeartDisease", title="Heart Disease Distribution", labels={0: "Healthy", 1: "Diseased"})
@@ -768,6 +768,7 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
 
 
 
