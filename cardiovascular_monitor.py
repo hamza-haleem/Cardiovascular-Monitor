@@ -159,7 +159,7 @@ def medical_suggestions(input_df):
         if items:
             final_suggestions.append(f"\n**{category}:**")
             for item in items:
-                final_suggestions.append(f" {item}")
+                final_suggestions.append(f"{item}")
     
     if not final_suggestions:
         final_suggestions = ["No significant red flags detected. Maintain healthy lifestyle and routine check-ups."]
@@ -238,7 +238,12 @@ with st.sidebar:
     page = st.radio("Select Page", ["📋 Diagnostic Report", "📊 Data Insights", "📈 Model Performance", "ℹ️ About"], label_visibility="collapsed")
     st.markdown("---")
     st.info("💡 Pro tip: Upload CSV on the Prediction page for batch predictions.")
-
+# Initialize Session State
+# --------------------------
+if "prediction_result" not in st.session_state:
+    st.session_state.prediction_result = None
+if "prediction_input" not in st.session_state:
+    st.session_state.prediction_input = None
 
 
 # --------------------------
@@ -359,7 +364,8 @@ if page == "📋 Diagnostic Report":
                         )
         except Exception as e:
             st.error(f"❌ Failed to process uploaded CSV: {e}")
-    
+    if st.session_state.prediction_input is not None:
+        input_data = st.session_state.prediction_input
     # --------------------------
     # Single prediction
     # --------------------------
@@ -380,7 +386,9 @@ if page == "📋 Diagnostic Report":
                 "Oldpeak": Oldpeak,
                 "ST_Slope": ST_Slope
             }])
-    
+            if do_predict:
+                st.session_state.prediction_input = current_input
+                st.session_state.prediction_result = None
             st.markdown("### 🧾 Patient Input Summary")
             with st.expander("View Patient Summary", expanded=False):
                 # Display a simple table (no Styler) for cloud stability
@@ -459,7 +467,7 @@ if page == "📋 Diagnostic Report":
                 st.markdown("### 📑 Clinical Recommendations")
                 with st.expander("View Clinical Recommendations & Risk Factors", expanded=False):
                     for s in suggestions:
-                        st.write("-" + s)
+                        st.write("" + s)
     
                 # Comparison chart (Plotly)
                 if dataset is not None:
@@ -477,7 +485,19 @@ if page == "📋 Diagnostic Report":
                                  title="Patient vs Population (Healthy vs Diseased Averages)",
                                  barmode='group',
                                  labels={"value": "Value", "variable": "Group"})
-                    st.plotly_chart(fig, use_container_width=True, config={'responsive': True})
+                    # Update layout for visibility: explicit text colors, legend styling
+                    fig.update_layout(
+                        font=dict(color='#000', size=12),
+                        title=dict(font=dict(color='#000', size=16)),
+                        xaxis=dict(tickfont=dict(color='#000'), titlefont=dict(color='#000')),
+                        yaxis=dict(tickfont=dict(color='#000'), titlefont=dict(color='#000')),
+                        legend=dict(font=dict(color='#000', size=11), bgcolor='rgba(255,255,255,0.7)'),
+                        hovermode='closest'
+                    )
+                    # Update hover template for visible text
+                    fig.update_traces(hovertemplate='<b>%{x}</b><br>%{fullData.name}: %{y:.2f}<extra></extra>')
+                    st.plotly_chart(fig, config={'responsive': True})
+                    
     
                 # Save single prediction to history
                 hist_row = {
@@ -492,7 +512,10 @@ if page == "📋 Diagnostic Report":
     
                 save_history(hist_row)
                 st.success("✅ Prediction saved to history.")
-    
+                if st.button("Clear and Start New Assessment"):
+                    st.session_state.prediction_input = None
+                    st.session_state.prediction_result = None
+                    st.rerun()
     # --------------------------
     # Prediction History
     # --------------------------
@@ -554,15 +577,31 @@ elif page == "📊 Data Insights":
         st.subheader("Feature Distributions")
         feature = st.selectbox("Choose feature to analyze", options=numeric_cols, index=0)
         fig = px.histogram(dataset, x=feature, nbins=30, title=f"Distribution: {feature}", marginal="box")
+        fig.update_layout(
+            font=dict(color='#000'),
+            title=dict(font=dict(color='#000')),
+            xaxis=dict(tickfont=dict(color='#000'), titlefont=dict(color='#000')),
+            yaxis=dict(tickfont=dict(color='#000'), titlefont=dict(color='#000'))
+        )
         st.plotly_chart(fig, config={'responsive': True})
 
         st.subheader("Correlation Heatmap")
         corr = dataset[numeric_cols].corr()
         fig2 = px.imshow(corr, text_auto=True, title="Feature Correlations", color_continuous_scale="RdBu")
+        fig2.update_layout(
+            font=dict(color='#000', size=11),
+            title=dict(font=dict(color='#000'))
+        )
+        fig2.update_traces(text=fig2.data[0].text, hovertemplate='%{x}<br>%{y}<br>%{text:.2f}<extra></extra>')
         st.plotly_chart(fig2, config={'responsive': True})
 
         st.subheader("Class Balance")
         fig3 = px.pie(dataset, names="HeartDisease", title="Heart Disease Distribution", labels={0: "Healthy", 1: "Diseased"})
+        fig3.update_layout(
+            font=dict(color='#000', size=12),
+            title=dict(font=dict(color='#000'))
+        )
+        fig3.update_traces(textposition='inside', textinfo='percent+label', hovertemplate='<b>%{label}</b><br>Count: %{value}<extra></extra>')
         st.plotly_chart(fig3, config={'responsive': True})
 
 # --------------------------
@@ -584,6 +623,14 @@ elif page == "📈 Model Performance":
             if metric_cols:
                 melt = comp.melt(id_vars="Model", value_vars=metric_cols, var_name="Metric", value_name="Value")
                 fig = px.bar(melt, x="Model", y="Value", color="Metric", barmode="group", title="Model Comparison")
+                fig.update_layout(
+                    font=dict(color='#000', size=12),
+                    title=dict(font=dict(color='#000')),
+                    xaxis=dict(tickfont=dict(color='#000'), titlefont=dict(color='#000')),
+                    yaxis=dict(tickfont=dict(color='#000'), titlefont=dict(color='#000')),
+                    legend=dict(font=dict(color='#000'), bgcolor='rgba(255,255,255,0.7)')
+                )
+                fig.update_traces(hovertemplate='<b>%{x}</b><br>%{fullData.name}: %{y:.4f}<extra></extra>')
                 st.plotly_chart(fig, config={'responsive': True})
         except Exception as e:
             st.error(f"❌ Error reading comparison file: {e}")
@@ -629,6 +676,7 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
 
 
 
