@@ -488,6 +488,7 @@ if page == "📋 Diagnostic Report":
                     st.plotly_chart(fig, theme=None, config={'responsive': True})
                     
                 # Save single prediction to history
+            if do_predict and pred is not None:
                 hist_row = {
                     "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                     "prediction": int(pred),
@@ -731,3 +732,4 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
