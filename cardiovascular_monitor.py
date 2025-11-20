@@ -166,13 +166,9 @@ def medical_suggestions(input_df):
     
     return final_suggestions
 
-
 # --------------------------
 # Load model & data
 # --------------------------
-
-
-
 st.set_page_config(
     page_title="Cardiovascular Monitor",
     layout="wide",
@@ -213,11 +209,9 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.markdown("---")
-
 model = load_model()
 if model is None:
     st.warning("⚠️ Best model not found. Please run training script `train_models.py` first to produce 'best_heart_model.pkl'.")
-
 
 # Load dataset if available
 dataset = load_dataset()
@@ -238,6 +232,8 @@ with st.sidebar:
     page = st.radio("Select Page", ["📋 Diagnostic Report", "📊 Data Insights", "📈 Model Performance", "ℹ️ About"], label_visibility="collapsed")
     st.markdown("---")
     st.info("💡 Pro tip: Upload CSV on the Prediction page for batch predictions.")
+
+
 # Initialize Session State
 # --------------------------
 if "prediction_result" not in st.session_state:
@@ -280,10 +276,6 @@ if page == "📋 Diagnostic Report":
         for warning in warnings:
             st.warning(f"⚠️ {warning}")
 
-
-    # --------------------------
-    # PAGE: Prediction (clean, Streamlit-Cloud-safe)
-    # --------------------------
     st.markdown("---")
     col_predict, col_upload = st.columns([1, 1])
     
@@ -298,7 +290,6 @@ if page == "📋 Diagnostic Report":
         
         do_predict = st.button("Perform Assessment")
 
-    
     with col_upload:
         uploaded_file = st.file_uploader("Upload CSV for batch predictions", type=["csv"])
     current_input = pd.DataFrame([{
@@ -325,7 +316,7 @@ if page == "📋 Diagnostic Report":
         try:
             batch_df = pd.read_csv(uploaded_file)
             st.write("Preview of uploaded data:")
-            st.dataframe(batch_df.head(), use_container_width=True)
+            st.dataframe(batch_df.head(), width='stretch')
     
             # required columns as list for deterministic ordering
             required_list = list(numeric_cols + categorical_cols)
@@ -369,7 +360,7 @@ if page == "📋 Diagnostic Report":
                         batch_df["Probability"] = probs
                         batch_df["RiskCategory"] = batch_df["Probability"].apply(lambda x: risk_category_from_prob(x) if pd.notna(x) else "Unknown")
                         st.success("✅ Batch prediction complete.")
-                        st.dataframe(batch_df.head(), use_container_width=True)
+                        st.dataframe(batch_df.head(), width='stretch')
     
                         csv = batch_df.to_csv(index=False).encode("utf-8")
                         st.download_button(
@@ -383,7 +374,6 @@ if page == "📋 Diagnostic Report":
     if st.session_state.prediction_input is not None:
         input_data = st.session_state.prediction_input
    
-    
         st.markdown("### 🧾 Patient Input Summary")
         with st.expander("View Patient Summary", expanded=True):
              
@@ -408,10 +398,11 @@ if page == "📋 Diagnostic Report":
                     RestingECG, MaxHR, ExerciseAngina, Oldpeak, ST_Slope
                 ],
             })
-    
-                # prepend icons to parameter column
+            summary_display["Value"] = summary_display["Value"].astype(str)
+
+            # prepend icons to parameter column
             summary_display["Parameter"] = summary_display["Parameter"].map(lambda x: f"{icon_map.get(x, '')}  {x}")
-            st.table(summary_display)  # stable display on Cloud
+            st.table(summary_display)
     
             # Run prediction safely
             try:
@@ -427,7 +418,7 @@ if page == "📋 Diagnostic Report":
     
             if pred is not None:
                 risk = risk_category_from_prob(prob) if pd.notna(prob) else "Unknown"
-                # Plotly gauge (works fine on Streamlit Cloud)
+                # Plotly gauge
                 color_map = {"Low": "#2ca02c", "Moderate": "#ffcc00", "High": "#d62728"}
                 fig_gauge = go.Figure(go.Indicator(
                     mode="gauge+number",
@@ -449,7 +440,7 @@ if page == "📋 Diagnostic Report":
                         }
                     }
                 ))
-                st.plotly_chart(fig_gauge, use_container_width=True, config={'responsive': True})
+                st.plotly_chart(fig_gauge, config={'responsive': True})
     
                 # Text result
                 if int(pred) == 1:
@@ -464,7 +455,7 @@ if page == "📋 Diagnostic Report":
                     for s in suggestions:
                         st.write("" + s)
     
-                # Comparison chart (Plotly)
+                # Comparison chart
                 if dataset is not None:
                     plot_cols = [c for c in numeric_cols if c not in ['Oldpeak', 'FastingBS']]
                     healthy_avg = dataset[dataset["HeartDisease"] == 0][plot_cols].mean()
@@ -487,18 +478,15 @@ if page == "📋 Diagnostic Report":
                         paper_bgcolor="rgba(255,255,255,0)",
                         plot_bgcolor="rgba(255,255,255,0)"
                     )
-
                     fig.update_traces(
                         hoverlabel=dict(
-                            bgcolor="#378DDE",     
+                            bgcolor="#1E3A8A",     
                             font_color="#F4F4F4",   
                             font_size=14
                         )
                     )
-
                     st.plotly_chart(fig, theme=None, config={'responsive': True})
                     
-    
                 # Save single prediction to history
                 hist_row = {
                     "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -550,14 +538,13 @@ if page == "📋 Diagnostic Report":
         if "risk_category" in history_df.columns:
             history_df = history_df[history_df["risk_category"].isin(risk_filter)]
     
-        st.dataframe(history_df, use_container_width=True)
+        st.dataframe(history_df, width='stretch')
     
         # Download history
         csv_history = history_df.to_csv(index=False).encode("utf-8")
         st.download_button("⬇️ Download Filtered History", data=csv_history, file_name="prediction_history.csv", mime="text/csv")
     else:
         st.info("No prediction history yet.")
-
 
 
 # --------------------------
@@ -598,23 +585,16 @@ elif page == "📊 Data Insights":
             plot_bgcolor='rgba(255,255,255,0)',
         
             hovermode='closest',
-            template="plotly_white"   # ← REQUIRED FOR READABILITY
+            template="plotly_white"
         )
         
         fig_dist.update_traces(
             hoverlabel=dict(
                 bgcolor='#1E3A8A',
-                
                 font_color='#F4F4F4',
                 font_size=14
             )
         )
-
-
-
-        
-        
-
         st.plotly_chart(fig_dist, theme=None, config={'responsive': True}, key="featuredist")
 
         st.subheader("Correlation Heatmap")
@@ -643,16 +623,12 @@ elif page == "📊 Data Insights":
         )
         fig_corr.update_traces(
             hoverlabel=dict(
-                bgcolor="#1E3A8A",   # royal blue (great contrast)
-                font_color="#F4F4F4", # soft white text
+                bgcolor="#1E3A8A",   
+                font_color="#F4F4F4",
                 font_size=14,
                
             )
         )
-
-
-        
-        
         st.plotly_chart(fig_corr, theme=None, config={'responsive': True}, key="heatmap")
 
         st.subheader("Class Balance")
@@ -670,19 +646,12 @@ elif page == "📊 Data Insights":
             textfont=dict(color='#000000', size=14),
         
             hovertemplate='<b>%{label}</b><br>Count: %{value}<extra></extra>',
-        
-            # 🔥 Dark/Light Safe Hover Styling
             hoverlabel=dict(
-                bgcolor="#1E3A8A",    # Royal Blue
-                
-                font_color="#F4F4F4", # Soft white
+                bgcolor="#1E3A8A",    
+                font_color="#F4F4F4", 
                 font_size=14
             )
         )
-
-
-            
-
         st.plotly_chart(fig_class, theme=None, config={'responsive': True}, key="class_balance")
 
 # --------------------------
@@ -718,9 +687,6 @@ elif page == "📈 Model Performance":
                         font_size=14
                     )
                 )
-                
-                
-
                 st.plotly_chart(fig, theme=None, config={'responsive': True})
         except Exception as e:
             st.error(f"❌ Error reading comparison file: {e}")
@@ -755,7 +721,6 @@ elif page == "ℹ️ About":
     for proper diagnosis and treatment planning.
     """)
     
-
 # --------------------------
 # Footer
 # --------------------------
@@ -766,78 +731,3 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
