@@ -14,8 +14,10 @@ import matplotlib.pyplot as plt
 import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime
-from datetime import date
+import pytz
 
+
+pkt = pytz.timezone("Asia/Karachi")
 
 # --------------------------
 # Config and constants
@@ -527,7 +529,7 @@ if page == "📋 Diagnostic Report":
                 # Save single prediction to history
             if do_predict and pred is not None:
                 hist_row = {
-                    "Timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    "Timestamp": datetime.now(pkt).strftime("%Y-%m-%d %H:%M:%S"),
                     "Prediction": int(pred),
                     "Probability": float(prob) if pd.notna(prob) else None,
                     "Risk_Category": risk
@@ -898,4 +900,5 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
 
