@@ -322,7 +322,7 @@ if page == "📋 Diagnostic Report":
             type=["csv"],
             help=(
                 "Make sure your CSV contains correctly formatted values.\n"
-                " - For example:\n"
+                "For example:\n"
                 " - Binary columns must use 0 and 1 (NOT Y/N) and.\n"
                 " - Numeric features must contain valid numbers.\n"
                 " - Column names must match the template exactly.\n"
@@ -859,5 +859,6 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+
 
 
