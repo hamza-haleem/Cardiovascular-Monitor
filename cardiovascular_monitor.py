@@ -23,7 +23,7 @@ MODEL_FILE = "best_heart_model.pkl"
 COMPARISON_CSV = "model_performance.csv"
 DATASET_CSV = "heart.csv"
 HISTORY_CSV = "pred_history.csv"
-
+PAGE_SIZE = 10
 # The numeric and categorical columns must match training
 numeric_cols = ["Age", "RestingBP", "Cholesterol", "FastingBS", "MaxHR", "Oldpeak"]
 categorical_cols = ["Sex", "ChestPainType", "RestingECG", "ExerciseAngina", "ST_Slope"]
@@ -55,8 +55,24 @@ def load_history(path=HISTORY_CSV):
     if os.path.exists(path):
         return pd.read_csv(path)
     return pd.DataFrame(columns=[
-        "timestamp","prediction","probability","risk_category"
+        "Timestamp","Prediction","Probability","Risk_Category"
     ] + numeric_cols + categorical_cols)
+
+def clear_history(path=HISTORY_CSV):
+    # Overwrite with empty dataframe having same columns
+    df = load_history(path)
+    cols = df.columns.tolist() if not df.empty else ["Timestamp","Prediction","Probability","Risk_Category"] + numeric_cols + categorical_cols
+    empty = pd.DataFrame(columns=cols)
+    empty.to_csv(path, index=False)
+
+def undo_last_history(path=HISTORY_CSV):
+    if not os.path.exists(path):
+        return
+    df = pd.read_csv(path)
+    if df.empty:
+        return
+    df = df.iloc[:-1]
+    df.to_csv(path, index=False)
 
 def risk_category_from_prob(prob):
     # prob is in [0,1]
@@ -240,7 +256,17 @@ if "prediction_result" not in st.session_state:
     st.session_state.prediction_result = None
 if "prediction_input" not in st.session_state:
     st.session_state.prediction_input = None
-
+if "batch_results" not in st.session_state:
+    st.session_state.batch_results = None
+if "batch_uploaded_name" not in st.session_state:
+    st.session_state.batch_uploaded_name = None
+# history UI state
+if "history_page" not in st.session_state:
+    st.session_state.history_page = 0
+if "history_risk_filter" not in st.session_state:
+    st.session_state.history_risk_filter = ["Low", "Moderate", "High"]
+if "history_date_range" not in st.session_state:
+    st.session_state.history_date_range = None
 
 # --------------------------
 # PAGE: Prediction
@@ -291,7 +317,18 @@ if page == "📋 Diagnostic Report":
         do_predict = st.button("Perform Assessment")
 
     with col_upload:
-        uploaded_file = st.file_uploader("Upload CSV for batch predictions", type=["csv"])
+        uploaded_file = st.file_uploader(
+            "Upload CSV for batch predictions",
+            type=["csv"],
+            help=(
+                "Make sure your CSV contains correctly formatted values.\n"
+                "For example:\n"
+                " - Binary columns must use 0 and 1 (NOT Y/N) and.\n"
+                " - Numeric features must contain valid numbers.\n"
+                " - Column names must match the template exactly.\n"
+                "Incorrect input values will impact the accuracy of predictions and may cause the file to fail loading."
+            )
+        )
     current_input = pd.DataFrame([{
         "Age": Age,
         "Sex": Sex,
@@ -312,68 +349,67 @@ if page == "📋 Diagnostic Report":
     # --------------------------
     # Batch predictions
     # --------------------------
-    if uploaded_file is not None:
+    if uploaded_file is not None and st.session_state.batch_results is None:
         try:
             batch_df = pd.read_csv(uploaded_file)
-            st.write("Preview of uploaded data:")
-            st.dataframe(batch_df.head(), width='stretch')
-    
+            st.session_state.batch_uploaded_name = getattr(uploaded_file, "name", "uploaded_batch.csv")
+
             # required columns as list for deterministic ordering
             required_list = list(numeric_cols + categorical_cols)
             required_set = set(required_list)
             uploaded_cols = set(batch_df.columns)
             missing = required_set - uploaded_cols
             extra = uploaded_cols - required_set
-    
+
             if missing:
                 st.error(f"❌ CSV missing required columns: {sorted(list(missing))}")
-            if extra:
-                st.warning(f"⚠️ CSV has extra columns that will be ignored: {sorted(list(extra))}")
-    
-            if not missing:
+            else:
+                batch_df_clean = batch_df[required_list].copy()
+
+                # Normalize categorical columns (case-insensitive)
+                for col in ["Sex", "ExerciseAngina", "ChestPainType"]:
+                    if col in batch_df_clean.columns:
+                        batch_df_clean[col] = batch_df_clean[col].astype(str).str.upper()
+
                 if model is None:
                     st.error("Model not available: cannot perform batch predictions.")
                 else:
-                    # select only required columns in consistent order
-                    batch_df_clean = batch_df[required_list].copy()
-    
-                    # Normalize categorical columns (case-insensitive)
-                    for col in ["Sex", "ExerciseAngina", "ChestPainType"]:
-                        if col in batch_df_clean.columns:
-                            batch_df_clean[col] = batch_df_clean[col].astype(str).str.upper()
-    
                     with st.spinner("Processing batch predictions..."):
                         try:
                             preds = model.predict(batch_df_clean)
-                            # handle case where model.predict_proba may not exist
                             if hasattr(model, "predict_proba"):
                                 probs = model.predict_proba(batch_df_clean)[:, 1]
                             else:
-                                # fallback: if model gives decision_function or only classes, set probs to NaN
-                                probs = [float("nan")] * len(preds)
+                                probs = [float('nan')] * len(preds)
+
+                            batch_df["Prediction"] = preds
+                            batch_df["Probability"] = probs
+                            batch_df["RiskCategory"] = batch_df["Probability"].apply(lambda x: risk_category_from_prob(x) if pd.notna(x) else "Unknown")
+
+                            # persist full results in session_state
+                            st.session_state.batch_results = batch_df
+                            st.success("✅ Batch prediction complete and persisted.")
                         except Exception as e:
                             st.error(f"❌ Prediction error during batch processing: {e}")
-                            preds, probs = None, None
-    
-                    if preds is not None:
-                        batch_df["Prediction"] = preds
-                        batch_df["Probability"] = probs
-                        batch_df["RiskCategory"] = batch_df["Probability"].apply(lambda x: risk_category_from_prob(x) if pd.notna(x) else "Unknown")
-                        st.success("✅ Batch prediction complete.")
-                        st.dataframe(batch_df.head(), width='stretch')
-    
-                        csv = batch_df.to_csv(index=False).encode("utf-8")
-                        st.download_button(
-                            "⬇️ Download Batch Results CSV",
-                            data=csv,
-                            file_name="batch_predictions.csv",
-                            mime="text/csv"
-                        )
         except Exception as e:
             st.error(f"❌ Failed to process uploaded CSV: {e}")
+
+    # If there's a persisted batch result, show it and provide the option to clear
+    if st.session_state.batch_results is not None:
+        st.markdown("---")
+        st.subheader("📂 Persisted Batch Predictions")
+        st.write(f"File: {st.session_state.batch_uploaded_name}")
+        st.dataframe(st.session_state.batch_results.head(), width='stretch')
+        csv = st.session_state.batch_results.to_csv(index=False).encode("utf-8")
+        st.download_button("⬇️ Download Batch Results CSV", data=csv, file_name="batch_predictions.csv", mime="text/csv")
+        if st.button("🗑️ Remove batch results", key="clear_batch"):
+            st.session_state.batch_results = None
+            st.session_state.batch_uploaded_name = None
+            st.rerun()
+
     if st.session_state.prediction_input is not None:
         input_data = st.session_state.prediction_input
-   
+
         st.markdown("### 🧾 Patient Input Summary")
         with st.expander("View Patient Summary", expanded=True):
              
@@ -490,21 +526,25 @@ if page == "📋 Diagnostic Report":
                 # Save single prediction to history
             if do_predict and pred is not None:
                 hist_row = {
-                    "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                    "prediction": int(pred),
-                    "probability": float(prob) if pd.notna(prob) else None,
-                    "risk_category": risk
+                    "Timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    "Prediction": int(pred),
+                    "Probability": float(prob) if pd.notna(prob) else None,
+                    "Risk_Category": risk
                 }
                 for c in (numeric_cols + categorical_cols):
                     # be safe: default to None if missing
                     hist_row[c] = input_data[c].iloc[0] if c in input_data.columns else None
-    
+            
                 save_history(hist_row)
                 st.success("✅ Prediction saved to history.")
-                if st.button("Clear and Start New Assessment"):
-                    st.session_state.prediction_input = None
-                    st.session_state.prediction_result = None
-                    st.rerun()
+
+        st.markdown("---")
+        if st.button("Clear and Start New Assessment", key="clear_and_new"):
+            st.session_state.prediction_input = None
+            st.session_state.prediction_result = None
+            st.rerun()
+
+
     # --------------------------
     # Prediction History
     # --------------------------
@@ -513,37 +553,124 @@ if page == "📋 Diagnostic Report":
     history_df = load_history()
     
     if not history_df.empty:
-        col_filter1, col_filter2 = st.columns([1, 1])
+        history_df["Timestamp"] = pd.to_datetime(history_df["Timestamp"], errors='coerce')
+        filtered_history_df = history_df.copy()
+        ts = history_df["Timestamp"].dropna()
+        if not ts.empty:
+            default_range = [ts.min().date(), ts.max().date()]
+        else:
+            today = datetime.now().date()
+            default_range = [today, today]
+
+        
     
+        col_filter1, col_filter2 = st.columns([1, 1])
         with col_filter1:
-            risk_filter = st.multiselect("Filter by Risk Category", options=["Low", "Moderate", "High"], default=["Low", "Moderate", "High"])
+            st.session_state.history_risk_filter = st.multiselect(
+                "Filter by Risk Category",
+                options=["Low", "Moderate", "High"],
+                default=st.session_state.history_risk_filter,
+                key="history_risk_multiselect"
+            )
     
         with col_filter2:
-            # ensure timestamp column is datetime and drop NaT for min/max
-            if "timestamp" in history_df.columns:
-                history_df["timestamp"] = pd.to_datetime(history_df["timestamp"], errors='coerce')
-                ts = history_df["timestamp"].dropna()
-                if not ts.empty:
-                    default_range = [ts.min().date(), ts.max().date()]
-                else:
-                    today = datetime.now().date()
-                    default_range = [today, today]
-    
-                date_range = st.date_input("Filter by date range", value=default_range)
-                # date_input returns a single date or two dates; normalize to two dates
-                if isinstance(date_range, (list, tuple)) and len(date_range) == 2:
-                    start_date, end_date = date_range
-                    history_df = history_df[(history_df["timestamp"].dt.date >= start_date) & (history_df["timestamp"].dt.date <= end_date)]
-    
-        # Apply risk filter
-        if "risk_category" in history_df.columns:
-            history_df = history_df[history_df["risk_category"].isin(risk_filter)]
-    
-        st.dataframe(history_df, width='stretch')
-    
-        # Download history
-        csv_history = history_df.to_csv(index=False).encode("utf-8")
-        st.download_button("⬇️ Download Filtered History", data=csv_history, file_name="prediction_history.csv", mime="text/csv")
+            # date_input returns a single date or two dates; provide two-date default and persist using a key
+            st.session_state.history_date_range = st.date_input(
+                "Filter by date range",
+                value=st.session_state.history_date_range if st.session_state.history_date_range is not None else default_range,
+                key="history_date_input"
+            )
+
+        # Action buttons for history: clear all, undo last
+        col_actions = st.columns([1, 1, 2])
+        with col_actions[0]:
+            if st.button("🧹 Clear All History", key="clear_all_history"):
+                clear_history()
+                st.success("History cleared.")
+                st.rerun()
+        with col_actions[1]:
+            if st.button("↶ Undo Last Assessment", key="undo_last"):
+                undo_last_history()
+                st.success("Last assessment removed from history.")
+                st.rerun()
+        with col_actions[2]:
+            st.write("")
+
+        if "Risk_Category" in filtered_history_df.columns and st.session_state.history_risk_filter:
+            filtered_history_df = filtered_history_df[filtered_history_df["Risk_Category"].isin(st.session_state.history_risk_filter)]
+
+        # Date range
+        if isinstance(st.session_state.history_date_range, (list, tuple)) and len(st.session_state.history_date_range) == 2:
+            start_date, end_date = st.session_state.history_date_range
+            # convert to date if datetime
+            if isinstance(start_date, datetime):
+                start_date = start_date.date()
+            if isinstance(end_date, datetime):
+                end_date = end_date.date()
+            filtered_history_df = filtered_history_df[
+                (filtered_history_df["Timestamp"].dt.date >= start_date) &
+                (filtered_history_df["Timestamp"].dt.date <= end_date)
+            ]
+
+        # Pagination logic
+        total_rows = len(filtered_history_df)
+        total_pages = max(1, (total_rows + PAGE_SIZE - 1) // PAGE_SIZE)
+        # ensure history_page within bounds
+        if st.session_state.history_page >= total_pages:
+            st.session_state.history_page = total_pages - 1
+        if st.session_state.history_page < 0:
+            st.session_state.history_page = 0
+
+        start_idx = st.session_state.history_page * PAGE_SIZE
+        end_idx = start_idx + PAGE_SIZE
+        page_df = filtered_history_df.iloc[start_idx:end_idx]
+
+        st.write(f"Showing page {st.session_state.history_page + 1} of {total_pages} — rows {start_idx + 1} to {min(end_idx, total_rows)} of {total_rows}")
+        st.dataframe(page_df, width='stretch')
+
+        # Per-page download
+        csv_page = page_df.to_csv(index=False).encode("utf-8")
+        st.download_button(f"⬇️ Download This Page (Rows {start_idx+1}-{min(end_idx,total_rows)})", data=csv_page, file_name=f"prediction_history_page_{st.session_state.history_page+1}.csv", mime="text/csv", key=f"download_page_{st.session_state.history_page}")
+        
+        csv_filtered = filtered_history_df.to_csv(index=False).encode("utf-8")
+        st.download_button(
+            "⬇️ Download Filtered History",
+            data=csv_filtered,
+            file_name="filtered_history.csv",
+            mime="text/csv",
+            key="download_filtered_history"
+        )
+        
+        csv_full = history_df.to_csv(index=False).encode("utf-8")
+        st.download_button(
+            label="📥 Download Full History",
+            data=csv_full,
+            file_name="full_history.csv",
+            mime="text/csv",
+            key="download_full_history"
+        )
+        
+        # Page navigation buttons
+        col_nav = st.columns([1, 1, 1])
+        with col_nav[0]:
+            if st.button("⬅️ Prev Page", key="prev_page"):
+                if st.session_state.history_page > 0:
+                    st.session_state.history_page -= 1
+                    st.rerun()
+        with col_nav[1]:
+            if st.button("Next Page ➡️", key="next_page"):
+                if st.session_state.history_page < total_pages - 1:
+                    st.session_state.history_page += 1
+                    st.rerun()
+        with col_nav[2]:
+            # quick jump to first/last
+            if st.button("⤴️ First Page", key="first_page"):
+                st.session_state.history_page = 0
+                st.rerun()
+            if st.button("⤵️ Last Page", key="last_page"):
+                st.session_state.history_page = total_pages - 1
+                st.rerun()
+
     else:
         st.info("No prediction history yet.")
 
@@ -732,4 +859,3 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
-
