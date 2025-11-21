@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime
+from datetime import date
 
 
 # --------------------------
@@ -322,8 +323,8 @@ if page == "📋 Diagnostic Report":
             type=["csv"],
             help=(
                 "Make sure your CSV contains correctly formatted values.\n"
-                "For example:\n"
-                " - Binary columns must use 0 and 1 (NOT Y/N or Yes/No).\n"
+                " - For example:\n"
+                " - Binary columns must use 0 and 1 (NOT Y/N) and.\n"
                 " - Numeric features must contain valid numbers.\n"
                 " - Column names must match the template exactly.\n"
                 " - Incorrect input values will impact the accuracy of predictions and may cause the file to fail loading."
@@ -554,6 +555,7 @@ if page == "📋 Diagnostic Report":
     
     if not history_df.empty:
         history_df["Timestamp"] = pd.to_datetime(history_df["Timestamp"], errors='coerce')
+        history_df = history_df.sort_values(by="Timestamp", ascending=False)
         filtered_history_df = history_df.copy()
         ts = history_df["Timestamp"].dropna()
         if not ts.empty:
@@ -563,7 +565,6 @@ if page == "📋 Diagnostic Report":
             default_range = [today, today]
 
         
-    
         col_filter1, col_filter2 = st.columns([1, 1])
         with col_filter1:
             st.session_state.history_risk_filter = st.multiselect(
@@ -585,9 +586,27 @@ if page == "📋 Diagnostic Report":
         col_actions = st.columns([1, 1, 2])
         with col_actions[0]:
             if st.button("🧹 Clear All History", key="clear_all_history"):
-                clear_history()
-                st.success("History cleared.")
-                st.rerun()
+                st.session_state.confirm_clear_history = True
+
+        # Confirmation dialog
+        if st.session_state.get("confirm_clear_history", False):
+
+            st.warning("⚠️ Are you sure you want to delete your entire prediction history? This action cannot be undone.")
+
+            col_confirm = st.columns([1, 1])
+
+            with col_confirm[0]:
+                if st.button("Yes, delete permanently"):
+                    clear_history()
+                    st.success("History cleared.")
+                    st.session_state.confirm_clear_history = False
+                    st.rerun()
+
+            with col_confirm[1]:
+                if st.button("Cancel"):
+                    st.session_state.confirm_clear_history = False
+                    st.info("Deletion canceled.")
+                    st.rerun()
         with col_actions[1]:
             if st.button("↶ Undo Last Assessment", key="undo_last"):
                 undo_last_history()
@@ -598,6 +617,22 @@ if page == "📋 Diagnostic Report":
 
         if "Risk_Category" in filtered_history_df.columns and st.session_state.history_risk_filter:
             filtered_history_df = filtered_history_df[filtered_history_df["Risk_Category"].isin(st.session_state.history_risk_filter)]
+
+        # Handle single-date selection
+        if isinstance(st.session_state.history_date_range, (list, tuple)):
+
+            # If exactly ONE date selected
+            if len(st.session_state.history_date_range) == 1:
+                only_date = st.session_state.history_date_range[0]
+
+                # Convert to date if datetime
+                if isinstance(only_date, datetime):
+                    only_date = only_date.date()
+
+                # Filter entries matching that specific day
+                filtered_history_df = filtered_history_df[
+                    filtered_history_df["Timestamp"].dt.date == only_date
+                ]
 
         # Date range
         if isinstance(st.session_state.history_date_range, (list, tuple)) and len(st.session_state.history_date_range) == 2:
@@ -611,6 +646,10 @@ if page == "📋 Diagnostic Report":
                 (filtered_history_df["Timestamp"].dt.date >= start_date) &
                 (filtered_history_df["Timestamp"].dt.date <= end_date)
             ]
+
+        filtered_history_df = filtered_history_df.sort_values(
+        by="Timestamp", ascending=False
+    )
 
         # Pagination logic
         total_rows = len(filtered_history_df)
@@ -859,7 +898,3 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
-
-
-
-
